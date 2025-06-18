@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SparkPad</title>
+    <link rel="icon" type="image/x-icon" href="pfp.png">
     <style>
         * {
             margin: 0;
@@ -77,21 +78,137 @@
             color: #ff8c00;
         }
 
-        .create-coin-btn {
-            margin: 2rem 1rem;
-            padding: 1rem;
-            background: linear-gradient(45deg, #ffd700, #ff8c00);
+        .connect-wallet-btn {
+            background: linear-gradient(45deg, #8b5cf6, #7c3aed);
             color: white;
-            text-align: center;
+            border: none;
+            padding: 0.75rem 1.5rem;
             border-radius: 10px;
             font-weight: bold;
-            text-decoration: none;
-            transition: transform 0.3s ease;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
         }
 
-        .create-coin-btn:hover {
+        .connect-wallet-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+            box-shadow: 0 5px 15px rgba(139, 92, 246, 0.4);
+        }
+
+        .connect-wallet-btn.connected {
+            background: linear-gradient(45deg, #10b981, #059669);
+        }
+
+        .wallet-address {
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+
+        /* Wallet Modal */
+        .wallet-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 2001;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .wallet-modal.active {
+            display: flex;
+        }
+
+        .wallet-modal-content {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 400px;
+            width: 90%;
+            border: 2px solid rgba(255, 215, 0, 0.4);
+            box-shadow: 0 20px 60px rgba(255, 215, 0, 0.3);
+            text-align: center;
+        }
+
+        .wallet-modal-title {
+            font-size: 1.5rem;
+            color: #ff8c00;
+            margin-bottom: 1.5rem;
+            font-weight: bold;
+        }
+
+        .wallet-options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .wallet-option {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .wallet-option:hover {
+            background: rgba(255, 249, 230, 0.9);
+            border-color: #ffd700;
+            transform: translateY(-2px);
+        }
+
+        .wallet-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: linear-gradient(45deg, #8b5cf6, #7c3aed);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .wallet-info h4 {
+            color: #ff8c00;
+            margin-bottom: 0.25rem;
+            text-align: left;
+        }
+
+        .wallet-info p {
+            color: #daa520;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+
+        .close-wallet-modal {
+            background: none;
+            border: none;
+            color: #daa520;
+            cursor: pointer;
+            font-size: 1.5rem;
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .close-wallet-modal:hover {
+            background: rgba(255, 215, 0, 0.1);
         }
 
         /* Main Content */
@@ -476,6 +593,215 @@
             line-height: 1.5;
         }
 
+        /* Profile Page */
+        .profile-page {
+            display: none;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #ffffff 0%, #fffef7 50%, #fff9e6 100%);
+            padding: 2rem;
+        }
+
+        .profile-page.active {
+            display: block;
+        }
+
+        .profile-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .profile-title {
+            font-size: 2rem;
+            color: #ff8c00;
+            font-weight: bold;
+        }
+
+        .profile-content {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 3rem;
+        }
+
+        .profile-form-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .profile-preview-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            text-align: center;
+        }
+
+        .profile-section {
+            margin-bottom: 2rem;
+        }
+
+        .profile-section-title {
+            font-size: 1.3rem;
+            color: #ff8c00;
+            margin-bottom: 1rem;
+            font-weight: bold;
+        }
+
+        .profile-avatar-upload {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .profile-avatar-preview {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ffd700, #ff8c00);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: white;
+            font-size: 3rem;
+            font-weight: bold;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .profile-avatar-preview:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4);
+        }
+
+        .profile-avatar-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .avatar-upload-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 50%;
+        }
+
+        .profile-avatar-preview:hover .avatar-upload-overlay {
+            opacity: 1;
+        }
+
+        .avatar-upload-text {
+            color: white;
+            font-size: 0.9rem;
+            font-weight: bold;
+        }
+
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .profile-stat {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(255, 249, 230, 0.8);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .profile-stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ff8c00;
+        }
+
+        .profile-stat-label {
+            font-size: 0.85rem;
+            color: #daa520;
+        }
+
+        .profile-info {
+            text-align: center;
+        }
+
+        .profile-display-name {
+            font-size: 1.5rem;
+            color: #ff8c00;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-username {
+            color: #daa520;
+            margin-bottom: 1rem;
+        }
+
+        .profile-bio {
+            color: #b8860b;
+            line-height: 1.5;
+            margin-bottom: 2rem;
+        }
+
+        .profile-badges {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .profile-badge {
+            background: linear-gradient(45deg, #ffd700, #ff8c00);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .save-profile-btn {
+            width: 100%;
+            background: linear-gradient(45deg, #ffd700, #ff8c00);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .save-profile-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4);
+        }
+
         .header {
             display: flex;
             justify-content: space-between;
@@ -592,12 +918,15 @@
             box-shadow: 0 10px 30px rgba(255, 215, 0, 0.4);
         }
 
-        /* Token Grid (for when tokens exist) */
         .tokens-grid {
-            display: grid;
+            display: none;
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
             gap: 1.5rem;
             margin-top: 2rem;
+        }
+
+        .tokens-grid.active {
+            display: grid;
         }
 
         .token-card {
@@ -608,6 +937,16 @@
             border: 1px solid rgba(255, 215, 0, 0.3);
             transition: all 0.3s ease;
             cursor: pointer;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: tokenFadeIn 0.6s ease-out forwards;
+        }
+
+        @keyframes tokenFadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .token-card:hover {
@@ -632,23 +971,40 @@
             justify-content: center;
             color: white;
             font-weight: bold;
+            overflow: hidden;
+            font-size: 1.5rem;
+        }
+
+        .token-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
         }
 
         .token-info h3 {
             color: #ff8c00;
             margin-bottom: 0.25rem;
+            font-size: 1.1rem;
         }
 
         .token-info p {
             color: #daa520;
+            font-size: 0.85rem;
+        }
+
+        .token-description {
+            color: #b8860b;
             font-size: 0.9rem;
+            margin-bottom: 1rem;
+            line-height: 1.4;
         }
 
         .token-stats {
             display: flex;
             justify-content: space-between;
-            margin: 1rem 0;
-            font-size: 0.9rem;
+            align-items: center;
+            font-size: 0.85rem;
         }
 
         .market-cap {
@@ -656,8 +1012,60 @@
             font-weight: bold;
         }
 
-        .replies {
+        .created-by {
             color: #daa520;
+        }
+
+        .time-ago {
+            color: #daa520;
+            font-size: 0.8rem;
+        }
+
+        .votes-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .vote-btn {
+            background: linear-gradient(45deg, #ffd700, #ff8c00);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .vote-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.4);
+        }
+
+        .vote-btn.voted {
+            background: #00c853;
+        }
+
+        .vote-count {
+            color: #ff8c00;
+            font-weight: bold;
+        }
+
+        .timer-badge {
+            background: #ff4444;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
         }
 
         /* Popup Modal */
@@ -776,23 +1184,6 @@
             transform: translateY(-2px);
             box-shadow: 0 10px 25px rgba(255, 215, 0, 0.4);
         }
-        @media (max-width: 768px) {
-            .sidebar {
-                display: none;
-            }
-
-            .main-content {
-                margin-left: 0;
-                padding: 1rem;
-            }
-
-            .search-input {
-                width: 200px;
-            }
-
-            .tokens-grid {
-                grid-template-columns: 1fr;
-            }
         /* Responsive */
         @media (max-width: 768px) {
             .sidebar {
@@ -804,8 +1195,23 @@
                 padding: 1rem;
             }
 
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+
+            .search-container {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
             .search-input {
-                width: 200px;
+                width: 100%;
+            }
+
+            .connect-wallet-btn {
+                justify-content: center;
             }
 
             .tokens-grid {
@@ -819,6 +1225,11 @@
 
             .popup-title {
                 font-size: 1.5rem;
+            }
+
+            .wallet-modal-content {
+                padding: 1.5rem;
+                margin: 1rem;
             }
 
             .create-coin-container {
@@ -848,6 +1259,23 @@
             .upload-area {
                 padding: 2rem;
             }
+
+            .profile-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .profile-preview-section {
+                order: -1;
+            }
+
+            .profile-page {
+                padding: 1rem;
+            }
+
+            .profile-stats {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -859,14 +1287,15 @@
             
             <ul class="nav-menu">
                 <li class="nav-item">
-                    <a href="#" class="active">🏠 home</a>
+                    <a href="#" class="active" onclick="showHomePage()">🏠 home</a>
                 </li>
                 <li class="nav-item">
-                    <a href="#">👤 profile</a>
+                    <a href="#" onclick="showProfilePage()">👤 profile</a>
+                </li>
+                <li class="nav-item">
+                    <a href="https://x.com/SparkPadXyz" target="_blank" style="font-size: 1.5rem; font-weight: bold; text-align: center;">𝕏</a>
                 </li>
             </ul>
-
-            <a href="#" class="create-coin-btn">🚀 create coin</a>
         </aside>
 
         <!-- Main Content -->
@@ -879,6 +1308,9 @@
                         <input type="text" class="search-input" placeholder="search for token">
                         <button class="search-btn">search</button>
                     </div>
+                    <button class="connect-wallet-btn" id="connectWalletBtn">
+                        🔗 Connect Wallet
+                    </button>
                 </div>
 
                 <!-- Stats Bar -->
@@ -905,9 +1337,110 @@
                     <a href="#" class="launch-first-btn">🚀 Launch First Token</a>
                 </div>
 
-                <!-- Token Grid (hidden for now since no tokens exist) -->
-                <div class="tokens-grid" style="display: none;">
+                <!-- Token Grid (hidden until coins start appearing) -->
+                <div class="tokens-grid" id="tokensGrid">
                     <!-- Token cards will appear here when tokens are created -->
+                </div>
+            </div>
+
+            <!-- Profile Page -->
+            <div class="profile-page" id="profilePage">
+                <div class="profile-container">
+                    <div class="profile-header">
+                        <button class="back-btn" onclick="showHomePage()">←</button>
+                        <h1 class="profile-title">Profile Settings</h1>
+                    </div>
+
+                    <div class="profile-content">
+                        <!-- Profile Form -->
+                        <div class="profile-form-section">
+                            <!-- Avatar Upload -->
+                            <div class="profile-section">
+                                <h3 class="profile-section-title">Profile Picture</h3>
+                                <div class="profile-avatar-upload">
+                                    <div class="profile-avatar-preview" id="profileAvatarPreview" onclick="document.getElementById('profileImageInput').click()">
+                                        <span id="profileAvatarText">?</span>
+                                        <div class="avatar-upload-overlay">
+                                            <span class="avatar-upload-text">📷 Upload</span>
+                                        </div>
+                                        <input type="file" id="profileImageInput" style="display: none;" accept="image/*">
+                                    </div>
+                                    <p style="color: #daa520; font-size: 0.9rem;">Click to upload your profile picture</p>
+                                </div>
+                            </div>
+
+                            <!-- Basic Info -->
+                            <div class="profile-section">
+                                <h3 class="profile-section-title">Basic Information</h3>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Display Name</label>
+                                    <input type="text" class="form-input" id="profileDisplayName" placeholder="Enter your display name">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Username</label>
+                                    <input type="text" class="form-input" id="profileUsername" placeholder="@username">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Bio <span class="optional-text">(optional)</span></label>
+                                    <textarea class="form-input form-textarea" id="profileBio" placeholder="Tell the community about yourself..." style="min-height: 80px;"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Social Links -->
+                            <div class="profile-section">
+                                <h3 class="profile-section-title">Social Links</h3>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Twitter/X <span class="optional-text">(optional)</span></label>
+                                    <input type="text" class="form-input" id="profileTwitter" placeholder="https://x.com/yourusername">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Website <span class="optional-text">(optional)</span></label>
+                                    <input type="text" class="form-input" id="profileWebsite" placeholder="https://yourwebsite.com">
+                                </div>
+                            </div>
+
+                            <button class="save-profile-btn" onclick="saveProfile()">💾 Save Profile</button>
+                        </div>
+
+                        <!-- Profile Preview -->
+                        <div class="profile-preview-section">
+                            <h3 class="profile-section-title">Preview</h3>
+                            
+                            <div class="profile-avatar-preview" style="cursor: default; margin-bottom: 1.5rem;">
+                                <span id="previewProfileAvatarText">?</span>
+                            </div>
+
+                            <div class="profile-info">
+                                <div class="profile-display-name" id="previewDisplayName">Display Name</div>
+                                <div class="profile-username" id="previewUsername">@username</div>
+                                <div class="profile-bio" id="previewBio">Your bio will appear here...</div>
+                                
+                                <div class="profile-badges">
+                                    <span class="profile-badge">New Member</span>
+                                </div>
+                            </div>
+
+                            <div class="profile-stats">
+                                <div class="profile-stat">
+                                    <div class="profile-stat-number">0</div>
+                                    <div class="profile-stat-label">Coins Created</div>
+                                </div>
+                                <div class="profile-stat">
+                                    <div class="profile-stat-number">0</div>
+                                    <div class="profile-stat-label">Votes Cast</div>
+                                </div>
+                                <div class="profile-stat">
+                                    <div class="profile-stat-number">0</div>
+                                    <div class="profile-stat-label">Reputation</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -1015,6 +1548,48 @@
             </div>
         </main>
 
+        <!-- Wallet Connection Modal -->
+        <div id="walletModal" class="wallet-modal">
+            <div class="wallet-modal-content">
+                <button class="close-wallet-modal" id="closeWalletBtn">×</button>
+                <h2 class="wallet-modal-title">Connect Your Wallet</h2>
+                
+                <div class="wallet-options">
+                    <div class="wallet-option" data-wallet="phantom">
+                        <div class="wallet-icon">👻</div>
+                        <div class="wallet-info">
+                            <h4>Phantom</h4>
+                            <p>Connect using Phantom wallet</p>
+                        </div>
+                    </div>
+                    
+                    <div class="wallet-option" data-wallet="solflare" style="opacity: 0.6;">
+                        <div class="wallet-icon">🔥</div>
+                        <div class="wallet-info">
+                            <h4>Solflare <span style="font-size: 0.8rem; color: #daa520;">(Coming Soon)</span></h4>
+                            <p>Integration in development</p>
+                        </div>
+                    </div>
+                    
+                    <div class="wallet-option" data-wallet="backpack" style="opacity: 0.6;">
+                        <div class="wallet-icon">🎒</div>
+                        <div class="wallet-info">
+                            <h4>Backpack <span style="font-size: 0.8rem; color: #daa520;">(Coming Soon)</span></h4>
+                            <p>Integration in development</p>
+                        </div>
+                    </div>
+                    
+                    <div class="wallet-option" data-wallet="sollet" style="opacity: 0.6;">
+                        <div class="wallet-icon">💼</div>
+                        <div class="wallet-info">
+                            <h4>Sollet <span style="font-size: 0.8rem; color: #daa520;">(Coming Soon)</span></h4>
+                            <p>Integration in development</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Popup Modal -->
         <div id="rulesPopup" class="popup-overlay">
             <div class="popup-modal">
@@ -1043,15 +1618,404 @@
         // Global variables for file handling
         let uploadedFile = null;
         let uploadedImageURL = null;
+        let profileImageURL = null;
+        let walletConnected = false;
+        let connectedWallet = null;
+        let walletAddress = null;
+        
+        // Random coin generation data
+        let coinCounter = 0;
+        let totalVolume = 0;
+        let activeTraders = 0;
+
+        const randomCoinData = {
+            animals: ['🐶', '🐱', '🐸', '🦊', '🐼', '🐨', '🦁', '🐯', '🐰', '🐹', '🐷', '🐸', '🐙', '🦀', '🐋', '🦎', '🐢', '🦆', '🐧', '🦅'],
+            names: [
+                'DogeCoin Classic', 'Shiba Dreams', 'Frog Finance', 'Fox Token', 'Panda Cash',
+                'Koala Coin', 'Lion Pride', 'Tiger Moon', 'Bunny Hop', 'Hamster Wheel',
+                'Pig Bank', 'Octopus Arms', 'Crab Cake', 'Whale Song', 'Gecko Green',
+                'Turtle Shell', 'Duck Pond', 'Penguin Ice', 'Eagle Eye', 'Bear Market'
+            ],
+            tickers: [
+                'DOGC', 'SHIB', 'FROG', 'FOX', 'PAND',
+                'KOAL', 'LION', 'TIGR', 'BUNY', 'HAMS',
+                'PIGB', 'OCTO', 'CRAB', 'WHAL', 'GECK',
+                'TURT', 'DUCK', 'PENG', 'EAGL', 'BEAR'
+            ],
+            descriptions: [
+                'The most memeable coin in existence!',
+                'To the moon and beyond with cute animals!',
+                'Community-driven token with diamond hands',
+                'Fair launch, no presale, pure fun',
+                'Building the future of animal finance',
+                'Rug-proof community token',
+                'The next 1000x gem, don\'t miss out!',
+                'Backed by memes and dreams',
+                'Hodl for the long term gains',
+                'Revolutionary tokenomics, amazing community'
+            ],
+            usernames: [
+                'CryptoKing', 'MoonHunter', 'DiamondHands', 'ShibaLover', 'DeFiMaster',
+                'TokenWhale', 'CoinCollector', 'MemeLord', 'ApeStrong', 'RocketMan',
+                'GemHunter', 'PumpKing', 'HODLer', 'CryptoNinja', 'MoonBoy'
+            ]
+        };
 
         // Show popup on page load
         window.addEventListener('load', function() {
             document.getElementById('rulesPopup').style.display = 'flex';
+            
+            // Check if Phantom wallet is already connected
+            checkExistingConnection();
+            
+            // Start random coin generation after 1 minute
+            setTimeout(() => {
+                startRandomCoinGeneration();
+            }, 60000); // 1 minute
         });
+
+        // Check for existing wallet connection
+        async function checkExistingConnection() {
+            if (window.solana && window.solana.isPhantom) {
+                try {
+                    const response = await window.solana.connect({ onlyIfTrusted: true });
+                    if (response.publicKey) {
+                        walletConnected = true;
+                        connectedWallet = 'Phantom';
+                        walletAddress = response.publicKey.toString();
+                        updateWalletButton();
+                        console.log('Auto-connected to Phantom:', walletAddress);
+                    }
+                } catch (error) {
+                    // No existing connection or user hasn't approved auto-connect
+                    console.log('No existing wallet connection');
+                }
+            }
+        }
+
+        // Random coin generation functions
+        function startRandomCoinGeneration() {
+            // Generate first coin immediately
+            generateRandomCoin();
+            
+            // Then generate a new coin every 30-60 seconds
+            setInterval(() => {
+                if (Math.random() > 0.3) { // 70% chance each interval
+                    generateRandomCoin();
+                }
+            }, 45000); // Every 45 seconds
+        }
+
+        function generateRandomCoin() {
+            const index = Math.floor(Math.random() * randomCoinData.animals.length);
+            
+            const coinData = {
+                avatar: randomCoinData.animals[index],
+                name: randomCoinData.names[index],
+                ticker: randomCoinData.tickers[index],
+                description: randomCoinData.descriptions[Math.floor(Math.random() * randomCoinData.descriptions.length)],
+                creator: randomCoinData.usernames[Math.floor(Math.random() * randomCoinData.usernames.length)],
+                marketCap: generateRandomMarketCap(),
+                votes: Math.floor(Math.random() * 4), // 0-3 votes (needs 5 to launch)
+                timeAgo: Math.floor(Math.random() * 5) + 1, // 1-5 minutes ago
+                id: `coin_${coinCounter++}`
+            };
+
+            createCoinCard(coinData);
+            updateStats();
+            
+            // Hide empty state when first coin appears
+            if (coinCounter === 1) {
+                document.querySelector('.empty-state').style.display = 'none';
+                document.querySelector('.tokens-grid').classList.add('active');
+            }
+        }
+
+        function generateRandomMarketCap() {
+            const amounts = [156, 234, 445, 678, 892, 1250, 2340, 3450, 5670, 8900];
+            return `${amounts[Math.floor(Math.random() * amounts.length)]}`;
+        }
+
+        function createCoinCard(coinData) {
+            const tokensGrid = document.querySelector('.tokens-grid');
+            
+            const card = document.createElement('div');
+            card.className = 'token-card';
+            card.id = coinData.id;
+            
+            const timeRemaining = 5 - coinData.timeAgo;
+            const timerDisplay = timeRemaining > 0 ? `${timeRemaining}m left` : 'Expired';
+            const timerClass = timeRemaining > 0 ? 'timer-badge' : 'timer-badge' ;
+            
+            card.innerHTML = `
+                <div class="token-header">
+                    <div class="token-avatar">
+                        ${coinData.avatar}
+                    </div>
+                    <div class="token-info">
+                        <h3>${coinData.name}</h3>
+                        <p>created by @${coinData.creator} • ${coinData.timeAgo}m ago</p>
+                    </div>
+                    <div class="${timerClass}">${timerDisplay}</div>
+                </div>
+                
+                <div class="token-description">
+                    ${coinData.description}
+                </div>
+                
+                <div class="token-stats">
+                    <span class="market-cap">market cap: ${coinData.marketCap}</span>
+                    <span class="created-by">${coinData.ticker}</span>
+                </div>
+                
+                <div class="votes-section">
+                    <button class="vote-btn" data-coin-id="${coinData.id}">
+                        👍 Vote
+                    </button>
+                    <span class="vote-count">${coinData.votes}/5 votes</span>
+                    ${timeRemaining <= 0 ? '<span style="color: #ff4444; font-size: 0.8rem;">❌ Failed to launch</span>' : ''}
+                </div>
+            `;
+            
+            // Add event listener for vote button
+            const voteBtn = card.querySelector('.vote-btn');
+            if (voteBtn) {
+                voteBtn.addEventListener('click', function() {
+                    voteForCoin(coinData.id);
+                });
+            }
+            
+            // Add to beginning of grid (newest first)
+            tokensGrid.insertBefore(card, tokensGrid.firstChild);
+            
+            // Auto-remove expired coins after they've been visible for a while
+            if (timeRemaining <= 0) {
+                setTimeout(() => {
+                    if (document.getElementById(coinData.id)) {
+                        document.getElementById(coinData.id).remove();
+                    }
+                }, 30000); // Remove after 30 seconds
+            }
+        }
+
+        function voteForCoin(coinId) {
+            if (!walletConnected) {
+                alert('Please connect your Phantom wallet to vote!');
+                openWalletModal();
+                return;
+            }
+
+            const card = document.getElementById(coinId);
+            const voteBtn = card.querySelector('.vote-btn');
+            const voteCount = card.querySelector('.vote-count');
+            
+            // Check if already voted
+            if (voteBtn.classList.contains('voted')) {
+                return;
+            }
+            
+            // Mark as voted
+            voteBtn.classList.add('voted');
+            voteBtn.innerHTML = '✅ Voted';
+            
+            // Get current votes and increment
+            const currentVotes = parseInt(voteCount.textContent.split('/')[0]) + 1;
+            voteCount.textContent = `${currentVotes}/5 votes`;
+            
+            // Show voting confirmation
+            console.log(`Vote cast from wallet: ${walletAddress}`);
+            
+            // Check if coin reaches 5 votes
+            if (currentVotes >= 5) {
+                setTimeout(() => {
+                    launchCoin(coinId);
+                }, 1000);
+            }
+            
+            // Add visual feedback
+            voteBtn.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                voteBtn.style.transform = 'scale(1)';
+            }, 100);
+        }
+
+        function launchCoin(coinId) {
+            const card = document.getElementById(coinId);
+            if (!card) return;
+            
+            // Add success animation
+            card.style.border = '2px solid #00c853';
+            card.style.boxShadow = '0 0 20px rgba(0, 200, 83, 0.5)';
+            
+            // Update votes section
+            const votesSection = card.querySelector('.votes-section');
+            votesSection.innerHTML = `
+                <div style="color: #00c853; font-weight: bold; text-align: center;">
+                    🚀 Successfully Launched! 🚀
+                </div>
+            `;
+            
+            // Remove timer badge
+            const timerBadge = card.querySelector('.timer-badge');
+            if (timerBadge) {
+                timerBadge.remove();
+            }
+            
+            // Update stats
+            totalVolume += Math.floor(Math.random() * 10000) + 5000;
+            activeTraders += Math.floor(Math.random() * 50) + 20;
+            updateStats();
+            
+            // Remove the card after celebration
+            setTimeout(() => {
+                if (document.getElementById(coinId)) {
+                    card.style.transform = 'scale(0.9)';
+                    card.style.opacity = '0.7';
+                }
+            }, 5000);
+        }
+
+        function updateStats() {
+            document.querySelector('.stat-item:nth-child(1) .stat-number').textContent = coinCounter;
+            document.querySelector('.stat-item:nth-child(2) .stat-number').textContent = `${totalVolume.toLocaleString()}`;
+            document.querySelector('.stat-item:nth-child(3) .stat-number').textContent = activeTraders;
+        }
 
         // Close popup function
         function closePopup() {
             document.getElementById('rulesPopup').style.display = 'none';
+        }
+
+        // Wallet connection functions
+        function openWalletModal() {
+            if (walletConnected) {
+                // If already connected, disconnect
+                disconnectWallet();
+            } else {
+                // Show wallet selection modal
+                document.getElementById('walletModal').classList.add('active');
+            }
+        }
+
+        function closeWalletModal() {
+            document.getElementById('walletModal').classList.remove('active');
+        }
+
+        async function connectWallet(walletType) {
+            try {
+                if (walletType === 'phantom') {
+                    await connectPhantom();
+                } else {
+                    // For other wallets, show not implemented message
+                    alert(`${walletType.charAt(0).toUpperCase() + walletType.slice(1)} wallet integration coming soon! Please use Phantom for now.`);
+                }
+            } catch (error) {
+                console.error('Wallet connection error:', error);
+                alert(`Failed to connect wallet: ${error.message}`);
+            }
+        }
+
+        async function connectPhantom() {
+            // Check if Phantom is installed
+            if (!window.solana || !window.solana.isPhantom) {
+                alert('Phantom wallet not detected! Please install Phantom from https://phantom.app/');
+                window.open('https://phantom.app/', '_blank');
+                return;
+            }
+
+            try {
+                // Request connection to Phantom
+                const response = await window.solana.connect();
+                
+                // Connection successful
+                walletConnected = true;
+                connectedWallet = 'Phantom';
+                walletAddress = response.publicKey.toString();
+
+                // Update UI
+                updateWalletButton();
+                closeWalletModal();
+
+                // Show success message
+                alert(`Successfully connected to Phantom!\nAddress: ${walletAddress.slice(0, 4)}...${walletAddress.slice(-4)}`);
+
+                console.log('Connected to Phantom:', walletAddress);
+
+            } catch (error) {
+                if (error.code === 4001) {
+                    // User rejected the connection
+                    alert('Connection cancelled by user');
+                } else {
+                    console.error('Phantom connection error:', error);
+                    alert('Failed to connect to Phantom wallet');
+                }
+            }
+        }
+
+        async function disconnectWallet() {
+            try {
+                if (window.solana && window.solana.isPhantom && walletConnected) {
+                    await window.solana.disconnect();
+                }
+                
+                walletConnected = false;
+                connectedWallet = null;
+                walletAddress = null;
+                updateWalletButton();
+                alert('Wallet disconnected successfully!');
+                
+                console.log('Wallet disconnected');
+            } catch (error) {
+                console.error('Disconnect error:', error);
+                // Reset state even if disconnect fails
+                walletConnected = false;
+                connectedWallet = null;
+                walletAddress = null;
+                updateWalletButton();
+            }
+        }
+
+        function updateWalletButton() {
+            const btn = document.getElementById('connectWalletBtn');
+            
+            if (walletConnected) {
+                btn.innerHTML = `✅ ${walletAddress.slice(0, 4)}...${walletAddress.slice(-4)}`;
+                btn.classList.add('connected');
+                btn.title = `Connected to ${connectedWallet}\nAddress: ${walletAddress}\nClick to disconnect`;
+            } else {
+                btn.innerHTML = '🔗 Connect Wallet';
+                btn.classList.remove('connected');
+                btn.title = 'Connect your Solana wallet';
+            }
+        }
+
+        // Listen for account changes
+        if (window.solana) {
+            window.solana.on('connect', () => {
+                console.log('Phantom wallet connected');
+            });
+
+            window.solana.on('disconnect', () => {
+                console.log('Phantom wallet disconnected');
+                walletConnected = false;
+                connectedWallet = null;
+                walletAddress = null;
+                updateWalletButton();
+            });
+
+            window.solana.on('accountChanged', (publicKey) => {
+                if (publicKey) {
+                    walletAddress = publicKey.toString();
+                    updateWalletButton();
+                    console.log('Account changed to:', walletAddress);
+                } else {
+                    // Account disconnected
+                    walletConnected = false;
+                    connectedWallet = null;
+                    walletAddress = null;
+                    updateWalletButton();
+                }
+            });
         }
 
         // Close popup when clicking outside
@@ -1061,27 +2025,57 @@
             }
         });
 
-        // Close popup with Escape key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closePopup();
+        // Close wallet modal when clicking outside
+        document.getElementById('walletModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeWalletModal();
             }
         });
 
-        // Navigate to create coin page
+        // Close popup with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                if (document.getElementById('walletModal').classList.contains('active')) {
+                    closeWalletModal();
+                } else {
+                    closePopup();
+                }
+            }
+        });
+
+        // Navigation functions
+        function showHomePage() {
+            document.getElementById('homePage').style.display = 'block';
+            document.getElementById('createCoinPage').classList.remove('active');
+            document.getElementById('profilePage').classList.remove('active');
+            document.getElementById('mainContent').classList.remove('create-mode');
+            
+            // Update nav active state
+            document.querySelector('.nav-item a.active').classList.remove('active');
+            document.querySelector('.nav-item a[onclick="showHomePage()"]').classList.add('active');
+        }
+
         function showCreateCoinPage() {
             document.getElementById('homePage').style.display = 'none';
             document.getElementById('createCoinPage').classList.add('active');
+            document.getElementById('profilePage').classList.remove('active');
             document.getElementById('mainContent').classList.add('create-mode');
+        }
+
+        function showProfilePage() {
+            document.getElementById('homePage').style.display = 'none';
+            document.getElementById('createCoinPage').classList.remove('active');
+            document.getElementById('profilePage').classList.add('active');
+            document.getElementById('mainContent').classList.add('create-mode');
+            
+            // Update nav active state
+            document.querySelector('.nav-item a.active').classList.remove('active');
+            document.querySelector('.nav-item a[onclick="showProfilePage()"]').classList.add('active');
         }
 
         // Go back to home page
         function goBack() {
-            document.getElementById('homePage').style.display = 'block';
-            document.getElementById('createCoinPage').classList.remove('active');
-            document.getElementById('mainContent').classList.remove('create-mode');
-            
-            // Reset form
+            showHomePage();
             resetForm();
         }
 
@@ -1094,7 +2088,76 @@
             updatePreview();
         }
 
-        // File upload handling
+        // Profile image upload handling
+        function handleProfileImageUpload(file) {
+            if (!file) return;
+
+            // Validate file size (10MB max for profile images)
+            const maxSize = 10 * 1024 * 1024;
+            if (file.size > maxSize) {
+                alert('Profile image too large! Maximum size is 10MB');
+                return;
+            }
+
+            // Only allow images for profile pictures
+            if (!file.type.startsWith('image/')) {
+                alert('Please select an image file for your profile picture');
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                profileImageURL = e.target.result;
+                
+                // Update profile avatar preview
+                const avatarPreview = document.getElementById('profileAvatarPreview');
+                avatarPreview.innerHTML = `<img src="${profileImageURL}" alt="Profile avatar">`;
+                
+                // Update preview in preview section
+                const previewAvatar = document.querySelector('#previewProfileAvatarText').parentElement;
+                previewAvatar.innerHTML = `<img src="${profileImageURL}" alt="Profile avatar">`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // Update profile preview
+        function updateProfilePreview() {
+            const displayName = document.getElementById('profileDisplayName').value || 'Display Name';
+            const username = document.getElementById('profileUsername').value || 'username';
+            const bio = document.getElementById('profileBio').value || 'Your bio will appear here...';
+            
+            document.getElementById('previewDisplayName').textContent = displayName;
+            document.getElementById('previewUsername').textContent = username.startsWith('@') ? username : '@' + username;
+            document.getElementById('previewBio').textContent = bio;
+            
+            // Update avatar if no image uploaded
+            if (!profileImageURL) {
+                const firstLetter = displayName.charAt(0).toUpperCase() || '?';
+                document.getElementById('profileAvatarText').textContent = firstLetter;
+                document.getElementById('previewProfileAvatarText').textContent = firstLetter;
+            }
+        }
+
+        // Save profile function
+        function saveProfile() {
+            const displayName = document.getElementById('profileDisplayName').value;
+            const username = document.getElementById('profileUsername').value;
+            
+            if (!displayName || !username) {
+                alert('Please fill in at least your display name and username!');
+                return;
+            }
+            
+            let message = `Profile saved successfully!\n\nDisplay Name: ${displayName}\nUsername: @${username.replace('@', '')}`;
+            
+            if (profileImageURL) {
+                message += '\nProfile picture updated';
+            }
+            
+            alert(message);
+        }
+
+        // File upload handling for coin creation
         function handleFileUpload(file) {
             if (!file) return;
 
@@ -1161,7 +2224,7 @@
             return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
         }
 
-        // Update preview as user types
+        // Update coin preview as user types
         function updatePreview() {
             const name = document.getElementById('coinName').value || 'Coin Name';
             const ticker = document.getElementById('coinTicker').value || 'TICKER';
@@ -1230,7 +2293,7 @@
         }
 
         // Create coin function
-        function createCoin() {
+        async function createCoin() {
             const name = document.getElementById('coinName').value;
             const ticker = document.getElementById('coinTicker').value;
             
@@ -1238,44 +2301,87 @@
                 alert('Please fill in at least the coin name and ticker!');
                 return;
             }
+
+            if (!walletConnected) {
+                alert('Please connect your wallet first to create a token!');
+                openWalletModal();
+                return;
+            }
             
             let message = `Creating coin: ${name} (${ticker.toUpperCase()})`;
             if (uploadedFile) {
                 message += `\nWith uploaded file: ${uploadedFile.name}`;
             }
-            message += `\n\nYour coin is now waiting for 5 community approvals!\nYou have 5 minutes to get the votes.`;
+            message += `\nConnected wallet: ${connectedWallet}`;
+            message += `\nWallet address: ${walletAddress}`;
+            message += `\n\nYour coin is now waiting for 5 community approvals!`;
+            message += `\nYou have 5 minutes to get the votes.`;
             
             alert(message);
             
-            // Here you would normally submit to your backend
+            // Here you would normally submit to your backend with wallet signature
             // For demo purposes, we'll just go back to home
             goBack();
         }
 
         // Add event listeners when DOM is loaded
         document.addEventListener('DOMContentLoaded', function() {
-            // Preview updates
+            // Coin creation preview updates
             document.getElementById('coinName').addEventListener('input', updatePreview);
             document.getElementById('coinTicker').addEventListener('input', updatePreview);
             document.getElementById('coinDescription').addEventListener('input', updatePreview);
             
-            // File upload
+            // Profile preview updates
+            document.getElementById('profileDisplayName').addEventListener('input', updateProfilePreview);
+            document.getElementById('profileUsername').addEventListener('input', updateProfilePreview);
+            document.getElementById('profileBio').addEventListener('input', updateProfilePreview);
+            
+            // File uploads
             document.getElementById('fileInput').addEventListener('change', function(e) {
                 if (e.target.files.length > 0) {
                     handleFileUpload(e.target.files[0]);
                 }
+            });
+
+            document.getElementById('profileImageInput').addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    handleProfileImageUpload(e.target.files[0]);
+                }
+            });
+
+            // Wallet connection event listeners
+            document.getElementById('connectWalletBtn').addEventListener('click', openWalletModal);
+            document.getElementById('closeWalletBtn').addEventListener('click', closeWalletModal);
+            
+            // Wallet option clicks
+            document.querySelectorAll('.wallet-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    const walletType = this.getAttribute('data-wallet');
+                    connectWallet(walletType);
+                });
             });
             
             // Setup drag and drop
             setupDragAndDrop();
         });
 
-        // Add interactivity
-        document.querySelectorAll('.nav-item a').forEach(link => {
-            link.addEventListener('click', function(e) {
+        // Add navigation functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click handlers to navigation items
+            document.querySelector('.nav-item a[href="#"]').onclick = function(e) {
                 e.preventDefault();
-                document.querySelector('.nav-item a.active').classList.remove('active');
-                this.classList.add('active');
+                showHomePage();
+            };
+            
+            // Find and add click handler to profile link
+            const navItems = document.querySelectorAll('.nav-item a');
+            navItems.forEach(item => {
+                if (item.textContent.includes('profile')) {
+                    item.onclick = function(e) {
+                        e.preventDefault();
+                        showProfilePage();
+                    };
+                }
             });
         });
 
@@ -1287,8 +2393,8 @@
             }
         });
 
-        // Create coin button functionality
-        document.querySelectorAll('.create-coin-btn, .launch-first-btn').forEach(btn => {
+        // Create coin button functionality - only for launch-first-btn now
+        document.querySelectorAll('.launch-first-btn').forEach(btn => {
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
                 showCreateCoinPage();
