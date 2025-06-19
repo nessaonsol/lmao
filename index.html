@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WIGS</title>
+    <title>GorPad</title>
+    <link rel="icon" type="image/x-icon" href="pfp.png">
     <style>
         * {
             margin: 0;
@@ -12,1662 +13,2370 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fff8 50%, #f0faf0 100%);
+            color: #2d5a2d;
+            line-height: 1.6;
             min-height: 100vh;
-            color: #333;
         }
 
-        .header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 40px 20px;
-            text-align: center;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
-            position: relative;
-            overflow: hidden;
+        .app-container {
+            display: flex;
+            min-height: 100vh;
         }
 
-        .header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: repeating-linear-gradient(
-                45deg,
-                transparent,
-                transparent 10px,
-                rgba(255,255,255,0.03) 10px,
-                rgba(255,255,255,0.03) 20px
-            );
-            animation: shimmer 20s linear infinite;
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-right: 1px solid rgba(34, 139, 34, 0.3);
+            padding: 2rem 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
         }
 
-        @keyframes shimmer {
-            0% { transform: translateX(-100%) translateY(-100%); }
-            100% { transform: translateX(100%) translateY(100%); }
+        .logo {
+            font-size: 2rem;
+            font-weight: bold;
+            background: linear-gradient(45deg, #228b22, #32cd32, #00ff00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            padding: 0 2rem;
+            margin-bottom: 2rem;
+            animation: glow 2s ease-in-out infinite alternate;
         }
 
-        .header h1 {
-            font-size: 3.2em;
-            margin-bottom: 15px;
-            font-weight: 300;
-            letter-spacing: 3px;
-            position: relative;
-            z-index: 2;
+        @keyframes glow {
+            from { filter: drop-shadow(0 0 5px rgba(34, 139, 34, 0.5)); }
+            to { filter: drop-shadow(0 0 20px rgba(34, 139, 34, 0.8)); }
         }
 
-        .header .subtitle {
-            font-size: 1.4em;
-            opacity: 0.95;
-            font-weight: 300;
-            position: relative;
-            z-index: 2;
-            margin-bottom: 20px;
+        .nav-menu {
+            list-style: none;
+            padding: 0 1rem;
         }
 
-        .social-button {
-            display: inline-block;
-            background: linear-gradient(145deg, #1DA1F2, #0d8bd9);
-            padding: 14px 28px;
-            border-radius: 30px;
-            color: white;
+        .nav-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .nav-item a {
+            display: block;
+            padding: 1rem;
+            color: #2d5a2d;
             text-decoration: none;
-            font-weight: 700;
-            letter-spacing: 1px;
-            font-size: 15px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .nav-item a:hover, .nav-item a.active {
+            background: linear-gradient(45deg, rgba(34, 139, 34, 0.1), rgba(50, 205, 50, 0.1));
+            color: #228b22;
+        }
+
+        .connect-wallet-btn {
+            background: linear-gradient(45deg, #32cd32, #228b22);
+            color: white;
             border: none;
-            position: relative;
-            z-index: 2;
-            box-shadow: 0 6px 20px rgba(29, 161, 242, 0.3);
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: bold;
             cursor: pointer;
-            overflow: hidden;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
         }
 
-        .social-button:hover {
-            background: linear-gradient(145deg, #0d8bd9, #0a7bc4);
-            transform: translateY(-3px);
-            box-shadow: 0 12px 30px rgba(29, 161, 242, 0.5);
+        .connect-wallet-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(34, 139, 34, 0.4);
         }
 
-        .social-button::before {
-            content: '';
-            position: absolute;
+        .connect-wallet-btn.connected {
+            background: linear-gradient(45deg, #00ff00, #32cd32);
+        }
+
+        .wallet-address {
+            font-family: monospace;
+            font-size: 0.85rem;
+        }
+
+        /* Wallet Modal */
+        .wallet-modal {
+            display: none;
+            position: fixed;
             top: 0;
-            left: -100%;
+            left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            transition: left 0.5s ease;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 2001;
+            align-items: center;
+            justify-content: center;
         }
 
-        .social-button:hover::before {
-            left: 100%;
+        .wallet-modal.active {
+            display: flex;
         }
 
-        .social-button:active {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(29, 161, 242, 0.3);
-        }
-
-        .main-container {
-            max-width: 1500px;
-            margin: 0 auto;
-            padding: 40px;
-            display: grid;
-            grid-template-columns: 1fr 420px;
-            gap: 50px;
-        }
-
-        .photo-workspace {
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 25px;
-            padding: 40px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
-            border: 1px solid rgba(255,255,255,0.3);
-        }
-
-        .upload-zone {
-            border: 3px dashed #d1d9ff;
+        .wallet-modal-content {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(15px);
             border-radius: 20px;
-            padding: 80px 40px;
+            padding: 2rem;
+            max-width: 400px;
+            width: 90%;
+            border: 2px solid rgba(34, 139, 34, 0.4);
+            box-shadow: 0 20px 60px rgba(34, 139, 34, 0.3);
             text-align: center;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .wallet-modal-title {
+            font-size: 1.5rem;
+            color: #228b22;
+            margin-bottom: 1.5rem;
+            font-weight: bold;
+        }
+
+        .wallet-options {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .wallet-option {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            border: 1px solid rgba(34, 139, 34, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
             cursor: pointer;
-            background: linear-gradient(145deg, #f8f9ff, #e8ecff);
-            position: relative;
-            overflow: hidden;
+            transition: all 0.3s ease;
         }
 
-        .upload-zone::before {
-            content: '';
+        .wallet-option:hover {
+            background: rgba(240, 250, 240, 0.9);
+            border-color: #32cd32;
+            transform: translateY(-2px);
+        }
+
+        .wallet-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: linear-gradient(45deg, #32cd32, #228b22);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .wallet-info h4 {
+            color: #228b22;
+            margin-bottom: 0.25rem;
+            text-align: left;
+        }
+
+        .wallet-info p {
+            color: #2d5a2d;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+
+        .close-wallet-modal {
+            background: none;
+            border: none;
+            color: #2d5a2d;
+            cursor: pointer;
+            font-size: 1.5rem;
             position: absolute;
-            top: 0;
-            left: -100%;
+            top: 1rem;
+            right: 1rem;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .close-wallet-modal:hover {
+            background: rgba(34, 139, 34, 0.1);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 250px;
+            flex: 1;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .main-content.create-mode {
+            padding: 0;
+        }
+
+        /* Create Coin Page */
+        .create-coin-page {
+            display: none;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fff8 50%, #f0faf0 100%);
+        }
+
+        .create-coin-page.active {
+            display: flex;
+        }
+
+        .create-coin-container {
+            display: grid;
+            grid-template-columns: 1fr 400px;
             width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.2), transparent);
-            transition: left 0.5s ease;
+            min-height: 100vh;
         }
 
-        .upload-zone:hover::before {
-            left: 100%;
+        .create-form-section {
+            padding: 2rem;
+            overflow-y: auto;
         }
 
-        .upload-zone:hover {
-            border-color: #667eea;
-            background: linear-gradient(145deg, #fff, #f0f4ff);
-            transform: translateY(-5px) scale(1.01);
-            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.2);
+        .create-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(34, 139, 34, 0.3);
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #228b22;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(34, 139, 34, 0.1);
+        }
+
+        .create-title {
+            font-size: 2rem;
+            color: #228b22;
+            font-weight: bold;
+        }
+
+        .form-section {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            color: #228b22;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .section-subtitle {
+            color: #2d5a2d;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            color: #2d5a2d;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid rgba(34, 139, 34, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #2d5a2d;
+            font-size: 1rem;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #32cd32;
+            box-shadow: 0 0 10px rgba(34, 139, 34, 0.3);
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .upload-area {
+            border: 2px dashed rgba(34, 139, 34, 0.4);
+            border-radius: 15px;
+            padding: 3rem;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.5);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .upload-area:hover {
+            border-color: #32cd32;
+            background: rgba(255, 255, 255, 0.8);
         }
 
         .upload-icon {
-            font-size: 4.5em;
-            margin-bottom: 25px;
-            color: #667eea;
-            filter: drop-shadow(0 4px 8px rgba(102, 126, 234, 0.3));
+            font-size: 3rem;
+            color: #2d5a2d;
+            margin-bottom: 1rem;
         }
 
         .upload-text {
-            font-size: 1.3em;
-            color: #555;
-            line-height: 1.8;
-            font-weight: 500;
+            color: #2d5a2d;
+            margin-bottom: 1rem;
         }
 
-        #fileInput {
+        .upload-subtext {
+            color: #2d5a2d;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .select-file-btn {
+            background: linear-gradient(45deg, #32cd32, #228b22);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .select-file-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .file-specs {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-top: 1.5rem;
+            font-size: 0.85rem;
+        }
+
+        .spec-section h4 {
+            color: #228b22;
+            margin-bottom: 0.5rem;
+        }
+
+        .spec-section ul {
+            list-style: none;
+            padding: 0;
+            color: #2d5a2d;
+        }
+
+        .spec-section li {
+            margin-bottom: 0.25rem;
+        }
+
+        .optional-text {
+            color: #2d5a2d;
+            font-size: 0.85rem;
+        }
+
+        .add-social-btn {
+            background: none;
+            border: 1px solid rgba(34, 139, 34, 0.4);
+            color: #228b22;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .add-social-btn:hover {
+            background: rgba(34, 139, 34, 0.1);
+        }
+
+        .warning-text {
+            background: rgba(240, 250, 240, 0.8);
+            border: 1px solid rgba(34, 139, 34, 0.4);
+            border-radius: 10px;
+            padding: 1rem;
+            color: #2d5a2d;
+            font-size: 0.9rem;
+            margin: 1.5rem 0;
+        }
+
+        .create-coin-final-btn {
+            width: 100%;
+            background: linear-gradient(45deg, #32cd32, #228b22);
+            color: white;
+            border: none;
+            padding: 1.2rem;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 2rem;
+        }
+
+        .create-coin-final-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(34, 139, 34, 0.4);
+        }
+
+        /* Preview Section */
+        .preview-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-left: 1px solid rgba(34, 139, 34, 0.3);
+            padding: 2rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .preview-title {
+            font-size: 1.5rem;
+            color: #228b22;
+            margin-bottom: 1rem;
+            font-weight: bold;
+        }
+
+        .preview-subtitle {
+            color: #2d5a2d;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .coin-preview {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid rgba(34, 139, 34, 0.3);
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .preview-coin-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #32cd32, #228b22);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: white;
+            font-size: 2rem;
+            font-weight: bold;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .preview-coin-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .upload-area.has-file {
+            border-color: #32cd32;
+            background: rgba(240, 250, 240, 0.8);
+        }
+
+        .file-preview {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            border: 1px solid rgba(34, 139, 34, 0.3);
             display: none;
         }
 
-        .canvas-container {
-            position: relative;
-            text-align: center;
-            margin-bottom: 40px;
+        .file-preview.active {
+            display: block;
         }
 
-        #photoCanvas {
-            max-width: 100%;
-            border-radius: 20px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.25);
-            background: #f8f9fa;
-            cursor: grab;
+        .file-preview-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
         }
 
-        #photoCanvas.dragging {
-            cursor: grabbing;
+        .file-preview-thumbnail {
+            width: 50px;
+            height: 50px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: linear-gradient(45deg, #32cd32, #228b22);
         }
 
-        #photoCanvas.resizing {
-            cursor: nw-resize;
+        .file-preview-info {
+            flex: 1;
         }
 
-        #photoCanvas.rotating {
-            cursor: crosshair;
+        .file-preview-name {
+            font-weight: bold;
+            color: #228b22;
+            margin-bottom: 0.25rem;
         }
 
-        .interaction-hints {
-            background: linear-gradient(145deg, #667eea, #764ba2);
-            color: white;
-            padding: 15px 20px;
-            border-radius: 15px;
-            margin-top: 20px;
-            font-size: 13px;
-            line-height: 1.6;
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        .file-preview-size {
+            font-size: 0.85rem;
+            color: #2d5a2d;
         }
 
-        .interaction-hints h4 {
-            margin-bottom: 10px;
-            font-size: 14px;
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
-
-        .hint-item {
-            margin-bottom: 5px;
-            opacity: 0.9;
-        }
-
-        .hair-controls-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            pointer-events: none;
-            z-index: 10;
-        }
-
-        .resize-handle {
-            position: absolute;
-            width: 12px;
-            height: 12px;
-            background: linear-gradient(145deg, #667eea, #764ba2);
-            border: 2px solid white;
-            border-radius: 50%;
-            cursor: nw-resize;
-            pointer-events: all;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-        }
-
-        .resize-handle:hover {
-            transform: scale(1.2);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
-        }
-
-        .hair-outline {
-            position: absolute;
-            border: 2px dashed rgba(102, 126, 234, 0.6);
-            border-radius: 50%;
-            pointer-events: none;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .controls-panel {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 25px;
-            margin-top: 40px;
-        }
-
-        .control-group {
-            background: linear-gradient(145deg, #f8f9ff, #e8ecff);
-            padding: 25px;
-            border-radius: 18px;
-            border: 1px solid rgba(102, 126, 234, 0.1);
-            backdrop-filter: blur(10px);
-        }
-
-        .control-group h4 {
-            margin-bottom: 18px;
-            color: #4a5568;
-            font-size: 1em;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-        }
-
-        .btn-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-
-        .control-btn {
-            padding: 14px 18px;
+        .remove-file-btn {
+            background: none;
             border: none;
-            border-radius: 12px;
-            background: linear-gradient(145deg, #667eea, #764ba2);
-            color: white;
+            color: #228b22;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-size: 13px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            position: relative;
-            overflow: hidden;
+            font-size: 1.2rem;
+            padding: 0.25rem;
+            border-radius: 50%;
+            transition: all 0.3s ease;
         }
 
-        .control-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
+        .remove-file-btn:hover {
+            background: rgba(34, 139, 34, 0.1);
+        }
+
+        .preview-coin-name {
+            font-size: 1.2rem;
+            color: #228b22;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .preview-coin-ticker {
+            color: #2d5a2d;
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        .preview-coin-desc {
+            color: #2d5a2d;
+            font-size: 0.9rem;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        /* Profile Page */
+        .profile-page {
+            display: none;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fff8 50%, #f0faf0 100%);
+            padding: 2rem;
+        }
+
+        .profile-page.active {
+            display: block;
+        }
+
+        .profile-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(34, 139, 34, 0.3);
+        }
+
+        .profile-title {
+            font-size: 2rem;
+            color: #228b22;
+            font-weight: bold;
+        }
+
+        .profile-content {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 3rem;
+        }
+
+        .profile-form-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(34, 139, 34, 0.3);
+        }
+
+        .profile-preview-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(34, 139, 34, 0.3);
+            text-align: center;
+        }
+
+        .profile-section {
+            margin-bottom: 2rem;
+        }
+
+        .profile-section-title {
+            font-size: 1.3rem;
+            color: #228b22;
+            margin-bottom: 1rem;
+            font-weight: bold;
+        }
+
+        .profile-avatar-upload {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .profile-avatar-preview {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #32cd32, #228b22);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            color: white;
+            font-size: 3rem;
+            font-weight: bold;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .profile-avatar-preview:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 30px rgba(34, 139, 34, 0.4);
+        }
+
+        .profile-avatar-preview img {
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.3s ease;
+            object-fit: cover;
+            border-radius: 50%;
         }
 
-        .control-btn:hover::before {
-            left: 100%;
-        }
-
-        .control-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 25px rgba(102, 126, 234, 0.4);
-        }
-
-        .sidebar {
-            background: rgba(255,255,255,0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 25px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.2);
-            overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.3);
-        }
-
-        .sidebar-header {
-            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-            color: white;
-            padding: 30px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .sidebar-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: repeating-linear-gradient(
-                -45deg,
-                transparent,
-                transparent 15px,
-                rgba(255,255,255,0.05) 15px,
-                rgba(255,255,255,0.05) 30px
-            );
-            animation: pulse 15s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 0.7; }
-        }
-
-        .sidebar-header h3 {
-            font-size: 1.5em;
-            font-weight: 400;
-            letter-spacing: 2px;
-            position: relative;
-            z-index: 2;
-        }
-
-        .wig-collection {
-            padding: 30px;
-        }
-
-        .category-section {
-            margin-bottom: 35px;
-        }
-
-        .category-title {
-            font-size: 1.2em;
-            font-weight: 700;
-            color: #2d3748;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 3px solid #e2e8f0;
-            position: relative;
-        }
-
-        .category-title::after {
-            content: '';
-            position: absolute;
-            bottom: -3px;
-            left: 0;
-            width: 40px;
-            height: 3px;
-            background: linear-gradient(90deg, #667eea, #764ba2);
-        }
-
-        .wig-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 18px;
-        }
-
-        .wig-card {
-            border: 2px solid #e2e8f0;
-            border-radius: 15px;
-            padding: 18px;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            background: linear-gradient(145deg, #fff, #f8f9ff);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .wig-card::before {
-            content: '';
+        .avatar-upload-overlay {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: linear-gradient(45deg, transparent, rgba(102, 126, 234, 0.05), transparent);
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             opacity: 0;
             transition: opacity 0.3s ease;
+            border-radius: 50%;
         }
 
-        .wig-card:hover::before {
+        .profile-avatar-preview:hover .avatar-upload-overlay {
             opacity: 1;
         }
 
-        .wig-card:hover {
-            border-color: #667eea;
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 15px 30px rgba(102, 126, 234, 0.2);
+        .avatar-upload-text {
+            color: white;
+            font-size: 0.9rem;
+            font-weight: bold;
         }
 
-        .wig-card.selected {
-            border-color: #ff6b6b;
-            background: linear-gradient(145deg, #fff5f5, #fff);
-            box-shadow: 0 15px 30px rgba(255, 107, 107, 0.3);
-            transform: translateY(-3px);
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
         }
 
-        .wig-preview {
+        .profile-stat {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(240, 250, 240, 0.8);
+            border-radius: 10px;
+            border: 1px solid rgba(34, 139, 34, 0.3);
+        }
+
+        .profile-stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #228b22;
+        }
+
+        .profile-stat-label {
+            font-size: 0.85rem;
+            color: #2d5a2d;
+        }
+
+        .profile-info {
+            text-align: center;
+        }
+
+        .profile-display-name {
+            font-size: 1.5rem;
+            color: #228b22;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .profile-username {
+            color: #2d5a2d;
+            margin-bottom: 1rem;
+        }
+
+        .profile-bio {
+            color: #2d5a2d;
+            line-height: 1.5;
+            margin-bottom: 2rem;
+        }
+
+        .profile-badges {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .profile-badge {
+            background: linear-gradient(45deg, #32cd32, #228b22);
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .save-profile-btn {
             width: 100%;
-            height: 70px;
-            margin-bottom: 15px;
-            border-radius: 35px 35px 10px 10px;
-            position: relative;
-            overflow: hidden;
+            background: linear-gradient(45deg, #32cd32, #228b22);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
         }
 
-        .wig-name {
-            font-size: 14px;
-            font-weight: 700;
-            color: #2d3748;
-            text-align: center;
-            margin-bottom: 6px;
-            letter-spacing: 0.5px;
+        .save-profile-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(34, 139, 34, 0.4);
         }
 
-        .wig-description {
-            font-size: 11px;
-            color: #718096;
-            text-align: center;
-            line-height: 1.4;
-            font-weight: 500;
-        }
-
-        .adjustment-panel {
-            padding: 30px;
-            border-top: 1px solid #e2e8f0;
-            background: linear-gradient(145deg, #f8f9ff, #e8ecff);
-        }
-
-        .slider-group {
-            margin-bottom: 25px;
-        }
-
-        .slider-label {
+        .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
-            font-size: 14px;
-            font-weight: 600;
-            color: #4a5568;
+            margin-bottom: 2rem;
         }
 
-        .slider-value {
-            background: linear-gradient(145deg, #667eea, #764ba2);
-            color: white;
-            padding: 4px 12px;
-            border-radius: 15px;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-        }
-
-        .slider {
-            width: 100%;
-            height: 8px;
-            border-radius: 4px;
-            background: #e2e8f0;
-            outline: none;
-            appearance: none;
-            transition: all 0.3s ease;
-        }
-
-        .slider::-webkit-slider-thumb {
-            appearance: none;
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: linear-gradient(145deg, #667eea, #764ba2);
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-            transition: all 0.3s ease;
-        }
-
-        .slider::-webkit-slider-thumb:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
-        }
-
-        .action-buttons {
-            display: grid;
-            gap: 15px;
-        }
-
-        .action-btn {
-            padding: 16px;
-            border: none;
-            border-radius: 12px;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            font-size: 14px;
-            letter-spacing: 1px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .action-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.3s ease;
-        }
-
-        .action-btn:hover::before {
-            left: 100%;
-        }
-
-        .btn-download {
-            background: linear-gradient(145deg, #48bb78, #38a169);
-            color: white;
-        }
-
-        .btn-reset {
-            background: linear-gradient(145deg, #718096, #4a5568);
-            color: white;
-        }
-
-        .btn-clear {
-            background: linear-gradient(145deg, #f56565, #e53e3e);
-            color: white;
-        }
-
-        .action-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 25px rgba(0,0,0,0.3);
-        }
-
-        /* Realistic Hair Textures */
-        .natural-blonde { 
-            background: 
-                radial-gradient(ellipse 2px 8px at 20% 30%, #fff2a0 0%, transparent 50%),
-                radial-gradient(ellipse 2px 8px at 40% 70%, #f5e050 0%, transparent 50%),
-                radial-gradient(ellipse 2px 8px at 90% 40%, #e6d43a 0%, transparent 50%),
-                radial-gradient(ellipse 2px 8px at 30% 80%, #d4c42e 0%, transparent 50%),
-                linear-gradient(125deg, #F5E050 0%, #E6D43A 50%, #D4C42E 100%);
-        }
-
-        .chocolate-brown { 
-            background: 
-                radial-gradient(ellipse 1px 6px at 25% 20%, #a0522d 0%, transparent 40%),
-                radial-gradient(ellipse 1px 6px at 75% 60%, #654321 0%, transparent 40%),
-                radial-gradient(ellipse 1px 6px at 50% 90%, #4a2c17 0%, transparent 40%),
-                linear-gradient(130deg, #8B4513 0%, #654321 50%, #4A2C17 100%);
-        }
-
-        .raven-black { 
-            background: 
-                radial-gradient(ellipse 1px 7px at 30% 25%, #404040 0%, transparent 30%),
-                radial-gradient(ellipse 1px 7px at 70% 75%, #2f2f2f 0%, transparent 30%),
-                linear-gradient(135deg, #2F2F2F 0%, #1C1C1C 50%, #0A0A0A 100%);
-        }
-
-        .auburn-red { 
-            background: 
-                radial-gradient(ellipse 2px 9px at 20% 40%, #cd5c5c 0%, transparent 50%),
-                radial-gradient(ellipse 2px 9px at 80% 20%, #b22222 0%, transparent 50%),
-                radial-gradient(ellipse 2px 9px at 60% 80%, #8b0000 0%, transparent 50%),
-                linear-gradient(120deg, #B22222 0%, #8B0000 50%, #660000 100%);
-        }
-
-        .platinum-silver { 
-            background: 
-                radial-gradient(ellipse 2px 8px at 25% 30%, #f5f5f5 0%, transparent 40%),
-                radial-gradient(ellipse 2px 8px at 75% 70%, #e5e5e5 0%, transparent 40%),
-                linear-gradient(140deg, #E5E5E5 0%, #C0C0C0 50%, #A0A0A0 100%);
-        }
-
-        .caramel-highlights { 
-            background: 
-                radial-gradient(ellipse 3px 10px at 15% 25%, #f4a460 0%, transparent 60%),
-                radial-gradient(ellipse 3px 10px at 45% 75%, #deb887 0%, transparent 60%),
-                radial-gradient(ellipse 3px 10px at 85% 45%, #cd853f 0%, transparent 60%),
-                linear-gradient(115deg, #CD853F 0%, #DEB887 25%, #F4A460 50%, #DEB887 75%, #CD853F 100%);
-        }
-
-        .copper-waves { 
-            background: 
-                radial-gradient(ellipse 2px 8px at 30% 20%, #cd853f 0%, transparent 50%),
-                radial-gradient(ellipse 2px 8px at 70% 60%, #b87333 0%, transparent 50%),
-                linear-gradient(125deg, #B87333 0%, #A0522D 50%, #8B4513 100%);
-        }
-
-        .ash-blonde { 
-            background: 
-                radial-gradient(ellipse 2px 9px at 20% 35%, #f0f8ff 0%, transparent 45%),
-                radial-gradient(ellipse 2px 9px at 80% 65%, #e6e6fa 0%, transparent 45%),
-                linear-gradient(130deg, #F5F5DC 0%, #E6E6FA 50%, #D3D3D3 100%);
-        }
-
-        @media (max-width: 1200px) {
-            .main-container {
-                grid-template-columns: 1fr;
-                gap: 40px;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 2.5em;
-            }
-            
-            .main-container {
-                padding: 20px;
-            }
-            
-            .wig-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .loading-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(255,255,255,0.95);
-            display: none;
+        .search-container {
+            display: flex;
+            gap: 1rem;
             align-items: center;
-            justify-content: center;
-            border-radius: 20px;
-            backdrop-filter: blur(10px);
         }
 
-        .spinner {
+        .search-input {
+            padding: 0.75rem 1rem;
+            border: 1px solid rgba(34, 139, 34, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            color: #2d5a2d;
+            width: 300px;
+            font-size: 1rem;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #32cd32;
+            box-shadow: 0 0 10px rgba(34, 139, 34, 0.3);
+        }
+
+        .search-btn {
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(45deg, #32cd32, #228b22);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .search-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .stat-item {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            border: 1px solid rgba(34, 139, 34, 0.3);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #228b22;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: #2d5a2d;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid rgba(34, 139, 34, 0.3);
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .empty-title {
+            font-size: 2rem;
+            color: #228b22;
+            margin-bottom: 1rem;
+        }
+
+        .empty-subtitle {
+            font-size: 1.2rem;
+            color: #2d5a2d;
+            margin-bottom: 2rem;
+        }
+
+        .launch-first-btn {
+            display: inline-block;
+            padding: 1.2rem 2.5rem;
+            background: linear-gradient(45deg, #32cd32, #228b22);
+            color: white;
+            text-decoration: none;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .launch-first-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(34, 139, 34, 0.4);
+        }
+
+        .tokens-grid {
+            display: none;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .tokens-grid.active {
+            display: grid;
+        }
+
+        .token-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 1px solid rgba(34, 139, 34, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: tokenFadeIn 0.6s ease-out forwards;
+        }
+
+        @keyframes tokenFadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .token-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(34, 139, 34, 0.3);
+        }
+
+        .token-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .token-avatar {
             width: 50px;
             height: 50px;
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #667eea;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        .quality-indicator {
-            position: absolute;
-            top: 15px;
-            right: 15px;
-            background: linear-gradient(145deg, #48bb78, #38a169);
+            background: linear-gradient(45deg, #32cd32, #228b22);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: white;
-            padding: 8px 15px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            font-weight: bold;
+            overflow: hidden;
+            font-size: 1.5rem;
         }
 
-        .canvas-container:hover .quality-indicator {
-            opacity: 1;
+        .token-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+
+        .token-info h3 {
+            color: #228b22;
+            margin-bottom: 0.25rem;
+            font-size: 1.1rem;
+        }
+
+        .token-info p {
+            color: #2d5a2d;
+            font-size: 0.85rem;
+        }
+
+        .token-description {
+            color: #2d5a2d;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        .token-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+        }
+
+        .market-cap {
+            color: #228b22;
+            font-weight: bold;
+        }
+
+        .created-by {
+            color: #2d5a2d;
+        }
+
+        .time-ago {
+            color: #2d5a2d;
+            font-size: 0.8rem;
+        }
+
+        .launch-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(34, 139, 34, 0.2);
+        }
+
+        .launch-btn {
+            background: linear-gradient(45deg, #32cd32, #228b22);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .launch-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(34, 139, 34, 0.4);
+        }
+
+        .launch-btn.launched {
+            background: #00ff00;
+        }
+
+        .launch-status {
+            color: #228b22;
+            font-weight: bold;
+        }
+
+        /* Popup Modal */
+        .popup-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .popup-modal {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 2.5rem;
+            max-width: 500px;
+            width: 90%;
+            border: 2px solid rgba(34, 139, 34, 0.4);
+            box-shadow: 0 20px 60px rgba(34, 139, 34, 0.3);
+            text-align: center;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .popup-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .popup-title {
+            font-size: 2rem;
+            color: #228b22;
+            margin-bottom: 1rem;
+            font-weight: bold;
+        }
+
+        .popup-subtitle {
+            font-size: 1.2rem;
+            color: #2d5a2d;
+            margin-bottom: 1.5rem;
+        }
+
+        .popup-rules {
+            background: rgba(240, 250, 240, 0.8);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            border: 1px solid rgba(34, 139, 34, 0.3);
+            text-align: left;
+        }
+
+        .popup-rules h4 {
+            color: #228b22;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+        }
+
+        .popup-rules ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .popup-rules li {
+            color: #2d5a2d;
+            margin-bottom: 0.75rem;
+            padding-left: 1.5rem;
+            position: relative;
+            line-height: 1.5;
+        }
+
+        .popup-rules li::before {
+            content: "🐸";
+            position: absolute;
+            left: 0;
+            color: #32cd32;
+        }
+
+        .popup-button {
+            background: linear-gradient(45deg, #32cd32, #228b22);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+
+        .popup-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(34, 139, 34, 0.4);
+        }
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding: 1rem;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+
+            .search-container {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .search-input {
+                width: 100%;
+            }
+
+            .connect-wallet-btn {
+                justify-content: center;
+            }
+
+            .tokens-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .popup-modal {
+                padding: 2rem;
+                margin: 1rem;
+            }
+
+            .popup-title {
+                font-size: 1.5rem;
+            }
+
+            .wallet-modal-content {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+
+            .create-coin-container {
+                grid-template-columns: 1fr;
+            }
+
+            .preview-section {
+                order: -1;
+                border-left: none;
+                border-bottom: 1px solid rgba(34, 139, 34, 0.3);
+                padding: 1.5rem;
+            }
+
+            .create-form-section {
+                padding: 1.5rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .file-specs {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .upload-area {
+                padding: 2rem;
+            }
+
+            .profile-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .profile-preview-section {
+                order: -1;
+            }
+
+            .profile-page {
+                padding: 1rem;
+            }
+
+            .profile-stats {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>WIGS</h1>
-        <div class="subtitle">Advanced hair simulation with photorealistic rendering</div>
-        <a href="https://x.com/WIGSONSOL" target="_blank" rel="noopener noreferrer" class="social-button">
-            𝕏 Follow @WIGSONSOL
-        </a>
-    </div>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">GorPad</div>
+            
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#" class="active" onclick="showHomePage()">🏠 home</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" onclick="showProfilePage()">👤 profile</a>
+                </li>
+                <li class="nav-item">
+                    <a href="https://x.com/GorPadXyz" target="_blank" style="font-size: 1.5rem; font-weight: bold; text-align: center;">𝕏</a>
+                </li>
+            </ul>
+        </aside>
 
-    <div class="main-container">
-        <div class="photo-workspace">
-            <div class="upload-zone" id="uploadZone">
-                <div class="upload-icon">📸</div>
-                <div class="upload-text">
-                    <strong>Upload Your Portrait</strong><br>
-                    Drag & drop or click to select<br>
-                    <small>Best results with front-facing photos • JPG, PNG, WebP • Max 15MB</small>
+        <!-- Main Content -->
+        <main class="main-content" id="mainContent">
+            <!-- Home Page -->
+            <div id="homePage">
+                <!-- Header -->
+                <div class="header">
+                    <div class="search-container">
+                        <input type="text" class="search-input" placeholder="search for token ending in 'gor'">
+                        <button class="search-btn">search</button>
+                    </div>
+                    <button class="connect-wallet-btn" id="connectWalletBtn">
+                        🔗 Connect Wallet
+                    </button>
                 </div>
-                <input type="file" id="fileInput" accept="image/*">
+
+                <!-- Stats Bar -->
+                <div class="stats-bar">
+                    <div class="stat-item">
+                        <div class="stat-number">0</div>
+                        <div class="stat-label">Gor Tokens Created</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">$0</div>
+                        <div class="stat-label">Total Volume</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">0</div>
+                        <div class="stat-label">Active Traders</div>
+                    </div>
+                </div>
+
+                <!-- Empty State -->
+                <div class="empty-state">
+                    <div class="empty-icon">🐸</div>
+                    <h2 class="empty-title">No Gor Tokens Yet</h2>
+                    <p class="empty-subtitle">Be the first to launch a memecoin ending in "gor" on GorPad!</p>
+                    <a href="#" class="launch-first-btn">🚀 Launch First Gor Token</a>
+                </div>
+
+                <!-- Token Grid (hidden until coins start appearing) -->
+                <div class="tokens-grid" id="tokensGrid">
+                    <!-- Token cards will appear here when tokens are created -->
+                </div>
             </div>
 
-            <div id="workspaceArea" style="display: none;">
-                <div class="canvas-container">
-                    <canvas id="photoCanvas"></canvas>
-                    <div class="hair-controls-overlay" id="hairControlsOverlay">
-                        <div class="resize-handle" id="resizeHandle" style="top: 10px; right: 10px;"></div>
-                        <div class="hair-outline" id="hairOutline"></div>
+            <!-- Profile Page -->
+            <div class="profile-page" id="profilePage">
+                <div class="profile-container">
+                    <div class="profile-header">
+                        <button class="back-btn" onclick="showHomePage()">←</button>
+                        <h1 class="profile-title">Profile Settings</h1>
                     </div>
-                    <div class="quality-indicator">ULTRA HD</div>
-                    <div class="loading-overlay" id="loadingOverlay">
-                        <div>
-                            <div class="spinner"></div>
-                            <div style="margin-top: 15px; font-weight: 600; color: #667eea;">Rendering realistic hair...</div>
+
+                    <div class="profile-content">
+                        <!-- Profile Form -->
+                        <div class="profile-form-section">
+                            <!-- Avatar Upload -->
+                            <div class="profile-section">
+                                <h3 class="profile-section-title">Profile Picture</h3>
+                                <div class="profile-avatar-upload">
+                                    <div class="profile-avatar-preview" id="profileAvatarPreview" onclick="document.getElementById('profileImageInput').click()">
+                                        <span id="profileAvatarText">?</span>
+                                        <div class="avatar-upload-overlay">
+                                            <span class="avatar-upload-text">📷 Upload</span>
+                                        </div>
+                                        <input type="file" id="profileImageInput" style="display: none;" accept="image/*">
+                                    </div>
+                                    <p style="color: #2d5a2d; font-size: 0.9rem;">Click to upload your profile picture</p>
+                                </div>
+                            </div>
+
+                            <!-- Basic Info -->
+                            <div class="profile-section">
+                                <h3 class="profile-section-title">Basic Information</h3>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Display Name</label>
+                                    <input type="text" class="form-input" id="profileDisplayName" placeholder="Enter your display name">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Username</label>
+                                    <input type="text" class="form-input" id="profileUsername" placeholder="@username">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Bio <span class="optional-text">(optional)</span></label>
+                                    <textarea class="form-input form-textarea" id="profileBio" placeholder="Tell the community about yourself..." style="min-height: 80px;"></textarea>
+                                </div>
+                            </div>
+
+                            <!-- Social Links -->
+                            <div class="profile-section">
+                                <h3 class="profile-section-title">Social Links</h3>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Twitter/X <span class="optional-text">(optional)</span></label>
+                                    <input type="text" class="form-input" id="profileTwitter" placeholder="https://x.com/yourusername">
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Website <span class="optional-text">(optional)</span></label>
+                                    <input type="text" class="form-input" id="profileWebsite" placeholder="https://yourwebsite.com">
+                                </div>
+                            </div>
+
+                            <button class="save-profile-btn" onclick="saveProfile()">💾 Save Profile</button>
+                        </div>
+
+                        <!-- Profile Preview -->
+                        <div class="profile-preview-section">
+                            <h3 class="profile-section-title">Preview</h3>
+                            
+                            <div class="profile-avatar-preview" style="cursor: default; margin-bottom: 1.5rem;">
+                                <span id="previewProfileAvatarText">?</span>
+                            </div>
+
+                            <div class="profile-info">
+                                <div class="profile-display-name" id="previewDisplayName">Display Name</div>
+                                <div class="profile-username" id="previewUsername">@username</div>
+                                <div class="profile-bio" id="previewBio">Your bio will appear here...</div>
+                                
+                                <div class="profile-badges">
+                                    <span class="profile-badge">Gor Pioneer</span>
+                                </div>
+                            </div>
+
+                            <div class="profile-stats">
+                                <div class="profile-stat">
+                                    <div class="profile-stat-number">0</div>
+                                    <div class="profile-stat-label">Gor Tokens Created</div>
+                                </div>
+                                <div class="profile-stat">
+                                    <div class="profile-stat-number">0</div>
+                                    <div class="profile-stat-label">Launches</div>
+                                </div>
+                                <div class="profile-stat">
+                                    <div class="profile-stat-number">0</div>
+                                    <div class="profile-stat-label">Reputation</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="interaction-hints">
-                    <h4>🎮 Interactive Controls</h4>
-                    <div class="hint-item">🖱️ <strong>Drag hair</strong> to reposition</div>
-                    <div class="hint-item">🔄 <strong>Mouse wheel</strong> to resize hair</div>
-                    <div class="hint-item">⌨️ <strong>Hold Shift + drag</strong> to rotate</div>
-                    <div class="hint-item">📱 <strong>Pinch/spread</strong> to resize on mobile</div>
-                    <div class="hint-item">👆 <strong>Two-finger rotate</strong> on mobile</div>
+            <!-- Create Coin Page -->
+            <div class="create-coin-page" id="createCoinPage">
+                <div class="create-coin-container">
+                    <!-- Form Section -->
+                    <div class="create-form-section">
+                        <div class="create-header">
+                            <button class="back-btn" onclick="goBack()">←</button>
+                            <h1 class="create-title">create new gor token</h1>
+                        </div>
+
+                        <!-- Coin Details -->
+                        <div class="form-section">
+                            <h3 class="section-title">gor token details</h3>
+                            <p class="section-subtitle">name your memecoin - it will automatically end with "gor"</p>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label class="form-label">token name (will end in "gor")</label>
+                                    <input type="text" class="form-input" id="coinName" placeholder="doge, shiba, pepe, etc.">
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label">ticker</label>
+                                    <input type="text" class="form-input" id="coinTicker" placeholder="add a ticker (e.g. DOGEGOR)">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">description <span class="optional-text">(optional)</span></label>
+                                <textarea class="form-input form-textarea" id="coinDescription" placeholder="describe your gor token"></textarea>
+                            </div>
+
+                            <button class="add-social-btn">
+                                🔗 add social links <span class="optional-text">(optional)</span>
+                            </button>
+                        </div>
+
+                        <!-- Upload Section -->
+                        <div class="form-section">
+                            <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()">
+                                <div class="upload-icon">📷</div>
+                                <div class="upload-text">select video or image to upload</div>
+                                <div class="upload-subtext">or drag and drop it here</div>
+                                <button class="select-file-btn" type="button">select file</button>
+                                <input type="file" id="fileInput" style="display: none;" accept="image/*,video/*">
+                            </div>
+
+                            <div class="file-preview" id="filePreview">
+                                <div class="file-preview-content">
+                                    <img class="file-preview-thumbnail" id="fileThumbnail" alt="File preview">
+                                    <div class="file-preview-info">
+                                        <div class="file-preview-name" id="fileName"></div>
+                                        <div class="file-preview-size" id="fileSize"></div>
+                                    </div>
+                                    <button class="remove-file-btn" onclick="removeFile()">×</button>
+                                </div>
+                            </div>
+
+                            <div class="file-specs">
+                                <div class="spec-section">
+                                    <h4>📄 file size and type</h4>
+                                    <ul>
+                                        <li>• image - max 10mb, ".jpg", ".gif" or ".png" recommended</li>
+                                        <li>• video - max 50mb, ".mp4" recommended</li>
+                                    </ul>
+                                </div>
+                                <div class="spec-section">
+                                    <h4>📐 resolution and aspect ratio</h4>
+                                    <ul>
+                                        <li>• image - min. 1000x1000px, 1:1 square recommended</li>
+                                        <li>• video - min. 400x400px, 1:1 square recommended</li>
+                                    </ul>
+                                </div>
+                            </div>
+
+                            <button class="add-social-btn" style="margin-top: 1rem;">
+                                🎨 add banner <span class="optional-text">(optional)</span>
+                            </button>
+                        </div>
+
+                        <div class="warning-text">
+                            🐸 Your gor token will launch instantly! No approval needed - just connect your wallet and create.
+                        </div>
+
+                        <button class="create-coin-final-btn" onclick="createCoin()">
+                            🚀 launch gor token
+                        </button>
+                    </div>
+
+                    <!-- Preview Section -->
+                    <div class="preview-section">
+                        <h2 class="preview-title">preview</h2>
+                        <p class="preview-subtitle">how your gor token will look</p>
+                        
+                        <div class="coin-preview">
+                            <div class="preview-coin-avatar" id="previewAvatar">?</div>
+                            <div class="preview-coin-name" id="previewName">Token Namegor</div>
+                            <div class="preview-coin-ticker" id="previewTicker">TICKER</div>
+                            <div class="preview-coin-desc" id="previewDesc">Your gor token description will appear here...</div>
+                        </div>
+                    </div>
                 </div>
+            </div>
+        </main>
 
-                <div class="controls-panel">
-                    <div class="control-group">
-                        <h4>Position Control</h4>
-                        <div class="btn-grid">
-                            <button class="control-btn" onclick="adjustWig('move', 'up')">↑ Up</button>
-                            <button class="control-btn" onclick="adjustWig('move', 'down')">↓ Down</button>
-                            <button class="control-btn" onclick="adjustWig('move', 'left')">← Left</button>
-                            <button class="control-btn" onclick="adjustWig('move', 'right')">→ Right</button>
+        <!-- Wallet Connection Modal -->
+        <div id="walletModal" class="wallet-modal">
+            <div class="wallet-modal-content">
+                <button class="close-wallet-modal" id="closeWalletBtn">×</button>
+                <h2 class="wallet-modal-title">Connect Your Wallet</h2>
+                
+                <div class="wallet-options">
+                    <div class="wallet-option" data-wallet="phantom">
+                        <div class="wallet-icon">👻</div>
+                        <div class="wallet-info">
+                            <h4>Phantom</h4>
+                            <p>Connect using Phantom wallet</p>
                         </div>
                     </div>
-
-                    <div class="control-group">
-                        <h4>Hair Flow</h4>
-                        <div class="btn-grid">
-                            <button class="control-btn" onclick="adjustWig('tilt', 'left')">↺ Tilt Left</button>
-                            <button class="control-btn" onclick="adjustWig('tilt', 'right')">↻ Tilt Right</button>
-                            <button class="control-btn" onclick="adjustWig('part', 'left')">〈 Part Left</button>
-                            <button class="control-btn" onclick="adjustWig('part', 'right')">〉 Part Right</button>
+                    
+                    <div class="wallet-option" data-wallet="solflare" style="opacity: 0.6;">
+                        <div class="wallet-icon">🔥</div>
+                        <div class="wallet-info">
+                            <h4>Solflare <span style="font-size: 0.8rem; color: #2d5a2d;">(Coming Soon)</span></h4>
+                            <p>Integration in development</p>
                         </div>
                     </div>
-
-                    <div class="control-group">
-                        <h4>Advanced</h4>
-                        <div class="btn-grid">
-                            <button class="control-btn" onclick="adjustWig('volume', 'more')">📈 More Volume</button>
-                            <button class="control-btn" onclick="adjustWig('volume', 'less')">📉 Less Volume</button>
-                            <button class="control-btn" onclick="adjustWig('texture', 'smooth')">✨ Smooth</button>
-                            <button class="control-btn" onclick="adjustWig('texture', 'tousled')">🌪 Tousled</button>
+                    
+                    <div class="wallet-option" data-wallet="backpack" style="opacity: 0.6;">
+                        <div class="wallet-icon">🎒</div>
+                        <div class="wallet-info">
+                            <h4>Backpack <span style="font-size: 0.8rem; color: #2d5a2d;">(Coming Soon)</span></h4>
+                            <p>Integration in development</p>
+                        </div>
+                    </div>
+                    
+                    <div class="wallet-option" data-wallet="sollet" style="opacity: 0.6;">
+                        <div class="wallet-icon">💼</div>
+                        <div class="wallet-info">
+                            <h4>Sollet <span style="font-size: 0.8rem; color: #2d5a2d;">(Coming Soon)</span></h4>
+                            <p>Integration in development</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="sidebar">
-            <div class="sidebar-header">
-                <h3>Premium Hair Collection</h3>
-            </div>
-
-            <div class="wig-collection">
-                <div class="category-section">
-                    <div class="category-title">Natural Collection</div>
-                    <div class="wig-grid">
-                        <div class="wig-card" onclick="selectWig('natural-blonde', 'long-layers')">
-                            <div class="wig-preview natural-blonde"></div>
-                            <div class="wig-name">Honey Blonde</div>
-                            <div class="wig-description">Long layered with natural highlights</div>
-                        </div>
-
-                        <div class="wig-card" onclick="selectWig('chocolate-brown', 'classic-bob')">
-                            <div class="wig-preview chocolate-brown"></div>
-                            <div class="wig-name">Chocolate Bob</div>
-                            <div class="wig-description">Sleek A-line with rich depth</div>
-                        </div>
-
-                        <div class="wig-card" onclick="selectWig('raven-black', 'straight-long')">
-                            <div class="wig-preview raven-black"></div>
-                            <div class="wig-name">Midnight Black</div>
-                            <div class="wig-description">Ultra-straight with glossy finish</div>
-                        </div>
-
-                        <div class="wig-card" onclick="selectWig('auburn-red', 'beachy-waves')">
-                            <div class="wig-preview auburn-red"></div>
-                            <div class="wig-name">Auburn Waves</div>
-                            <div class="wig-description">Soft waves with copper tones</div>
-                        </div>
-                    </div>
+        <!-- Popup Modal -->
+        <div id="rulesPopup" class="popup-overlay">
+            <div class="popup-modal">
+                <div class="popup-icon">🐸</div>
+                <h2 class="popup-title">Welcome to GorPad!</h2>
+                <p class="popup-subtitle">Launch Memecoins Ending in "gor"</p>
+                
+                <div class="popup-rules">
+                    <h4>🚀 How It Works:</h4>
+                    <ul>
+                        <li>Create tokens that automatically end with <strong>"gor"</strong> (like "dogegor", "pepegor")</li>
+                        <li><strong>Instant launch</strong> - no waiting, no approval needed!</li>
+                        <li>Connect your Solana wallet and create immediately</li>
+                        <li>Join the <strong>gor revolution</strong> and build the next big memecoin!</li>
+                    </ul>
                 </div>
-
-                <div class="category-section">
-                    <div class="category-title">Signature Styles</div>
-                    <div class="wig-grid">
-                        <div class="wig-card" onclick="selectWig('platinum-silver', 'edgy-pixie')">
-                            <div class="wig-preview platinum-silver"></div>
-                            <div class="wig-name">Platinum Pixie</div>
-                            <div class="wig-description">Bold short cut with texture</div>
-                        </div>
-
-                        <div class="wig-card" onclick="selectWig('caramel-highlights', 'voluminous-layers')">
-                            <div class="wig-preview caramel-highlights"></div>
-                            <div class="wig-name">Caramel Dreams</div>
-                            <div class="wig-description">Multi-tonal with body and bounce</div>
-                        </div>
-
-                        <div class="wig-card" onclick="selectWig('copper-waves', 'spiral-curls')">
-                            <div class="wig-preview copper-waves"></div>
-                            <div class="wig-name">Copper Curls</div>
-                            <div class="wig-description">Defined spirals with shine</div>
-                        </div>
-
-                        <div class="wig-card" onclick="selectWig('ash-blonde', 'beach-waves')">
-                            <div class="wig-preview ash-blonde"></div>
-                            <div class="wig-name">Ash Blonde</div>
-                            <div class="wig-description">Cool-toned effortless waves</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="adjustment-panel">
-                <div class="slider-group">
-                    <div class="slider-label">
-                        <span>Hair Volume</span>
-                        <span class="slider-value" id="volumeValue">100%</span>
-                    </div>
-                    <input type="range" class="slider" id="hairVolume" min="60" max="150" value="100" onchange="updateHairVolume()">
-                </div>
-
-                <div class="slider-group">
-                    <div class="slider-label">
-                        <span>Opacity</span>
-                        <span class="slider-value" id="opacityValue">90%</span>
-                    </div>
-                    <input type="range" class="slider" id="hairOpacity" min="50" max="100" value="90" onchange="updateHairOpacity()">
-                </div>
-
-                <div class="slider-group">
-                    <div class="slider-label">
-                        <span>Hair Density</span>
-                        <span class="slider-value" id="densityValue">100%</span>
-                    </div>
-                    <input type="range" class="slider" id="hairDensity" min="70" max="130" value="100" onchange="updateHairDensity()">
-                </div>
-
-                <div class="slider-group">
-                    <div class="slider-label">
-                        <span>Shine Level</span>
-                        <span class="slider-value" id="shineValue">80%</span>
-                    </div>
-                    <input type="range" class="slider" id="hairShine" min="30" max="120" value="80" onchange="updateHairShine()">
-                </div>
-
-                <div class="action-buttons">
-                    <button class="action-btn btn-download" onclick="downloadResult()">💾 Download HD Result</button>
-                    <button class="action-btn btn-reset" onclick="resetHairStyle()">🔄 Reset Style</button>
-                    <button class="action-btn btn-clear" onclick="removeHair()">❌ Remove Hair</button>
-                </div>
+                
+                <button class="popup-button" onclick="closePopup()">
+                    🐸 Got it! Let's Launch
+                </button>
             </div>
         </div>
     </div>
 
     <script>
-        let canvas, ctx, originalImage, currentHair = null;
-        let hairSettings = {
-            position: { x: 0, y: -20 },
-            volume: 1.0,
-            opacity: 0.9,
-            density: 1.0,
-            shine: 0.8,
-            tilt: 0,
-            part: 'center',
-            texture: 'natural',
-            flow: 'down'
+        // Global variables for file handling
+        let uploadedFile = null;
+        let uploadedImageURL = null;
+        let profileImageURL = null;
+        let walletConnected = false;
+        let connectedWallet = null;
+        let walletAddress = null;
+        
+        // Random coin generation data
+        let coinCounter = 0;
+        let totalVolume = 0;
+        let activeTraders = 0;
+
+        const customTickers = [
+            "ASIAN", "KAI", "RETARD", "OLDLADY", "Muppet", "DIH", "FAT", "PIG", "LEBRON", "SEXY",
+            "COOK", "DREADS", "GOAT", "CLEAN", "Myla", "Otis", "TWINS", "CUTIE", "LMAO", "lol"
+        ];
+
+        const randomCoinData = {
+            animals: ['🐸', '🐶', '🐱', '🦊', '🐼', '🐨', '🦁', '🐯', '🐰', '🐹', '🐷', '🐙', '🦀', '🐋', '🦎', '🐢', '🦆', '🐧', '🦅', '🐻'],
+            names: [
+                'frogor', 'dogegor', 'shibagor', 'foxgor', 'pandagor',
+                'koalgor', 'liongor', 'tigegor', 'bunnygor', 'hamstegor',
+                'piggor', 'octogor', 'crabgor', 'whalegor', 'geckogor',
+                'turtlegor', 'duckgor', 'penguingor', 'eaglegor', 'beargor'
+            ],
+            tickers: [
+                'FROGOR', 'DOGEGOR', 'SHIBAGOR', 'FOXGOR', 'PANDAGOR',
+                'KOALGOR', 'LIONGOR', 'TIGEGOR', 'BUNNYGOR', 'HAMSTEGOR',
+                'PIGGOR', 'OCTOGOR', 'CRABGOR', 'WHALEGOR', 'GECKOGOR',
+                'TURTLEGOR', 'DUCKGOR', 'PENGUINGOR', 'EAGLEGOR', 'BEARGOR'
+            ],
+            descriptions: [
+                'The most memeable gor token in existence!',
+                'Ribbit your way to the moon with this gor!',
+                'Community-driven gor token with diamond hands',
+                'Fair launch gor token, pure fun and profits',
+                'Building the future of gor finance',
+                'Rug-proof community gor token',
+                'The next 1000x gor gem, don\'t miss out!',
+                'Backed by memes, dreams, and gor power',
+                'Hodl this gor for long term gains',
+                'Revolutionary gor tokenomics, amazing community'
+            ],
+            usernames: [
+                'GorKing', 'FrogHunter', 'DiamondGor', 'GorLover', 'DeFiGor',
+                'GorWhale', 'GorCollector', 'GorLord', 'ApeGor', 'RocketGor',
+                'GorHunter', 'PumpGor', 'HODLGor', 'GorNinja', 'MoonGor'
+            ]
         };
 
-        // Interaction state
-        let isInteracting = false;
-        let interactionMode = 'none'; // 'drag', 'resize', 'rotate'
-        let lastMousePos = { x: 0, y: 0 };
-        let hairBounds = { x: 0, y: 0, width: 0, height: 0 };
-        let touches = [];
+        // Show popup on page load
+        window.addEventListener('load', function() {
+            document.getElementById('rulesPopup').style.display = 'flex';
+            
+            // Check if Phantom wallet is already connected
+            checkExistingConnection();
+            
+            // Start random coin generation after 5 seconds
+            setTimeout(() => {
+                startRandomCoinGeneration();
+            }, 5000); // 5 seconds
+        });
 
-        // Realistic hair strand patterns
-        const hairPatterns = {
-            'natural-blonde': {
-                baseColors: ['#F5E050', '#E6D43A', '#D4C42E', '#FFF2A0', '#F8F88A'],
-                highlights: ['#FFFACD', '#F0E68C'],
-                shadows: ['#D4AF37', '#B8860B'],
-                texture: 'straight',
-                flow: 'smooth'
-            },
-            'chocolate-brown': {
-                baseColors: ['#8B4513', '#654321', '#4A2C17', '#A0522D', '#CD853F'],
-                highlights: ['#D2B48C', '#DEB887'],
-                shadows: ['#3E2723', '#5D4037'],
-                texture: 'smooth',
-                flow: 'sleek'
-            },
-            'raven-black': {
-                baseColors: ['#2F2F2F', '#1C1C1C', '#0A0A0A', '#404040', '#363636'],
-                highlights: ['#696969', '#808080'],
-                shadows: ['#000000', '#1a1a1a'],
-                texture: 'sleek',
-                flow: 'straight'
-            },
-            'auburn-red': {
-                baseColors: ['#B22222', '#8B0000', '#660000', '#CD5C5C', '#DC143C'],
-                highlights: ['#FA8072', '#F4A460'],
-                shadows: ['#4B0000', '#800000'],
-                texture: 'wavy',
-                flow: 'bouncy'
-            },
-            'platinum-silver': {
-                baseColors: ['#E5E5E5', '#C0C0C0', '#A0A0A0', '#F5F5F5', '#DCDCDC'],
-                highlights: ['#FFFFFF', '#F8F8FF'],
-                shadows: ['#A9A9A9', '#808080'],
-                texture: 'textured',
-                flow: 'edgy'
-            },
-            'caramel-highlights': {
-                baseColors: ['#CD853F', '#DEB887', '#F4A460', '#D2B48C', '#BC9A6A'],
-                highlights: ['#FFE4B5', '#FFEFD5'],
-                shadows: ['#8B7355', '#A0522D'],
-                texture: 'layered',
-                flow: 'voluminous'
-            },
-            'copper-waves': {
-                baseColors: ['#B87333', '#A0522D', '#8B4513', '#CD853F', '#D2B48C'],
-                highlights: ['#F4A460', '#DEB887'],
-                shadows: ['#654321', '#8B4513'],
-                texture: 'curly',
-                flow: 'spiral'
-            },
-            'ash-blonde': {
-                baseColors: ['#F5F5DC', '#E6E6FA', '#D3D3D3', '#F0F8FF', '#E0E6F8'],
-                highlights: ['#FFFAFA', '#F5F5F5'],
-                shadows: ['#C0C0C0', '#B0C4DE'],
-                texture: 'wavy',
-                flow: 'beachy'
+        // Check for existing wallet connection
+        async function checkExistingConnection() {
+            if (window.solana && window.solana.isPhantom) {
+                try {
+                    const response = await window.solana.connect({ onlyIfTrusted: true });
+                    if (response.publicKey) {
+                        walletConnected = true;
+                        connectedWallet = 'Phantom';
+                        walletAddress = response.publicKey.toString();
+                        updateWalletButton();
+                        console.log('Auto-connected to Phantom:', walletAddress);
+                    }
+                } catch (error) {
+                    // No existing connection or user hasn't approved auto-connect
+                    console.log('No existing wallet connection');
+                }
             }
-        };
-
-        document.addEventListener('DOMContentLoaded', initializeStudio);
-
-        function initializeStudio() {
-            setupEventListeners();
-            canvas = document.getElementById('photoCanvas');
-            ctx = canvas.getContext('2d');
-            
-            // Enable high-quality rendering
-            ctx.imageSmoothingEnabled = true;
-            ctx.imageSmoothingQuality = 'high';
-            
-            setupCanvasInteractions();
         }
 
-        function setupEventListeners() {
-            const uploadZone = document.getElementById('uploadZone');
-            const fileInput = document.getElementById('fileInput');
-
-            uploadZone.addEventListener('click', () => fileInput.click());
+        // Random coin generation functions
+        function startRandomCoinGeneration() {
+            // Generate first coin immediately
+            generateRandomCoin();
             
-            uploadZone.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                uploadZone.style.transform = 'translateY(-5px) scale(1.02)';
-            });
-
-            uploadZone.addEventListener('dragleave', () => {
-                uploadZone.style.transform = '';
-            });
-
-            uploadZone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                uploadZone.style.transform = '';
-                if (e.dataTransfer.files.length > 0) {
-                    handleImageUpload(e.dataTransfer.files[0]);
+            // Then generate a new coin every 30-60 seconds
+            setInterval(() => {
+                if (Math.random() > 0.3) { // 70% chance each interval
+                    generateRandomCoin();
                 }
-            });
-
-            fileInput.addEventListener('change', (e) => {
-                if (e.target.files.length > 0) {
-                    handleImageUpload(e.target.files[0]);
-                }
-            });
+            }, 45000); // Every 45 seconds
         }
 
-        function setupCanvasInteractions() {
-            // Mouse events
-            canvas.addEventListener('mousedown', handleMouseDown);
-            canvas.addEventListener('mousemove', handleMouseMove);
-            canvas.addEventListener('mouseup', handleMouseUp);
-            canvas.addEventListener('mouseleave', handleMouseUp);
-            canvas.addEventListener('wheel', handleWheel, { passive: false });
-
-            // Touch events for mobile
-            canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
-            canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
-            canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
-
-            // Show/hide interaction elements
-            canvas.addEventListener('mouseenter', showInteractionElements);
-            canvas.addEventListener('mouseleave', hideInteractionElements);
-        }
-
-        function handleMouseDown(e) {
-            if (!currentHair) return;
+        function generateRandomCoin() {
+            let coinData;
             
-            const rect = canvas.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            
-            // Convert to canvas coordinates
-            const canvasX = (x / rect.width) * canvas.width;
-            const canvasY = (y / rect.height) * canvas.height;
-            
-            if (isPointInHair(canvasX, canvasY)) {
-                isInteracting = true;
-                lastMousePos = { x: e.clientX, y: e.clientY };
+            // Use custom tickers for first 20 coins
+            if (coinCounter < customTickers.length) {
+                const customTicker = customTickers[coinCounter];
+                const imageNumber = coinCounter + 1; // image1, image2, etc.
                 
-                if (e.shiftKey) {
-                    interactionMode = 'rotate';
-                    canvas.classList.add('rotating');
+                coinData = {
+                    avatar: `image${imageNumber}.png`, // Custom image
+                    name: customTicker.toLowerCase() + 'gor',
+                    ticker: customTicker,
+                    description: randomCoinData.descriptions[Math.floor(Math.random() * randomCoinData.descriptions.length)],
+                    creator: randomCoinData.usernames[Math.floor(Math.random() * randomCoinData.usernames.length)],
+                    marketCap: generateRandomMarketCap(),
+                    timeAgo: Math.floor(Math.random() * 5) + 1, // 1-5 minutes ago
+                    id: `coin_${coinCounter}`,
+                    isCustomImage: true
+                };
+            } else {
+                // Fall back to random generation after first 20
+                const index = Math.floor(Math.random() * randomCoinData.animals.length);
+                
+                coinData = {
+                    avatar: randomCoinData.animals[index],
+                    name: randomCoinData.names[index],
+                    ticker: randomCoinData.tickers[index],
+                    description: randomCoinData.descriptions[Math.floor(Math.random() * randomCoinData.descriptions.length)],
+                    creator: randomCoinData.usernames[Math.floor(Math.random() * randomCoinData.usernames.length)],
+                    marketCap: generateRandomMarketCap(),
+                    timeAgo: Math.floor(Math.random() * 5) + 1, // 1-5 minutes ago
+                    id: `coin_${coinCounter}`,
+                    isCustomImage: false
+                };
+            }
+
+            coinCounter++;
+            createCoinCard(coinData);
+            updateStats();
+            
+            // Hide empty state when first coin appears
+            if (coinCounter === 1) {
+                document.querySelector('.empty-state').style.display = 'none';
+                document.querySelector('.tokens-grid').classList.add('active');
+            }
+        }
+
+        function generateRandomMarketCap() {
+            const amounts = [156, 234, 445, 678, 892, 1250, 2340, 3450, 5670, 8900];
+            return `${amounts[Math.floor(Math.random() * amounts.length)]}`;
+        }
+
+        function createCoinCard(coinData) {
+            const tokensGrid = document.querySelector('.tokens-grid');
+            
+            const card = document.createElement('div');
+            card.className = 'token-card';
+            card.id = coinData.id;
+            
+            // Handle avatar display - either custom image or emoji
+            let avatarContent;
+            if (coinData.isCustomImage) {
+                avatarContent = `<img src="${coinData.avatar}" alt="${coinData.name}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">`;
+            } else {
+                avatarContent = coinData.avatar;
+            }
+            
+            card.innerHTML = `
+                <div class="token-header">
+                    <div class="token-avatar">
+                        ${avatarContent}
+                    </div>
+                    <div class="token-info">
+                        <h3>${coinData.name}</h3>
+                        <p>created by @${coinData.creator} • ${coinData.timeAgo}m ago</p>
+                    </div>
+                </div>
+                
+                <div class="token-description">
+                    ${coinData.description}
+                </div>
+                
+                <div class="token-stats">
+                    <span class="market-cap">market cap: ${coinData.marketCap}</span>
+                    <span class="created-by">${coinData.ticker}</span>
+                </div>
+                
+                <div class="launch-section">
+                    <button class="launch-btn" data-coin-id="${coinData.id}">
+                        🚀 Launch
+                    </button>
+                    <span class="launch-status">Ready to launch!</span>
+                </div>
+            `;
+            
+            // Add event listener for launch button
+            const launchBtn = card.querySelector('.launch-btn');
+            if (launchBtn) {
+                launchBtn.addEventListener('click', function() {
+                    launchCoin(coinData.id);
+                });
+            }
+            
+            // Add to beginning of grid (newest first)
+            tokensGrid.insertBefore(card, tokensGrid.firstChild);
+        }
+
+        function launchCoin(coinId) {
+            if (!walletConnected) {
+                alert('Please connect your Phantom wallet to launch!');
+                openWalletModal();
+                return;
+            }
+
+            const card = document.getElementById(coinId);
+            const launchBtn = card.querySelector('.launch-btn');
+            const launchStatus = card.querySelector('.launch-status');
+            
+            // Check if already launched
+            if (launchBtn.classList.contains('launched')) {
+                return;
+            }
+            
+            // Mark as launched
+            launchBtn.classList.add('launched');
+            launchBtn.innerHTML = '✅ Launched';
+            launchStatus.innerHTML = 'Successfully launched!';
+            launchStatus.style.color = '#00ff00';
+            
+            // Show launch confirmation
+            console.log(`Gor token launched from wallet: ${walletAddress}`);
+            
+            // Add success animation
+            card.style.border = '2px solid #00ff00';
+            card.style.boxShadow = '0 0 20px rgba(0, 255, 0, 0.5)';
+            
+            // Update stats
+            totalVolume += Math.floor(Math.random() * 10000) + 5000;
+            activeTraders += Math.floor(Math.random() * 50) + 20;
+            updateStats();
+            
+            // Add visual feedback
+            launchBtn.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                launchBtn.style.transform = 'scale(1)';
+            }, 100);
+        }
+
+        function updateStats() {
+            document.querySelector('.stat-item:nth-child(1) .stat-number').textContent = coinCounter;
+            document.querySelector('.stat-item:nth-child(2) .stat-number').textContent = `$${totalVolume.toLocaleString()}`;
+            document.querySelector('.stat-item:nth-child(3) .stat-number').textContent = activeTraders;
+        }
+
+        // Close popup function
+        function closePopup() {
+            document.getElementById('rulesPopup').style.display = 'none';
+        }
+
+        // Wallet connection functions
+        function openWalletModal() {
+            if (walletConnected) {
+                // If already connected, disconnect
+                disconnectWallet();
+            } else {
+                // Show wallet selection modal
+                document.getElementById('walletModal').classList.add('active');
+            }
+        }
+
+        function closeWalletModal() {
+            document.getElementById('walletModal').classList.remove('active');
+        }
+
+        async function connectWallet(walletType) {
+            try {
+                if (walletType === 'phantom') {
+                    await connectPhantom();
                 } else {
-                    interactionMode = 'drag';
-                    canvas.classList.add('dragging');
+                    // For other wallets, show not implemented message
+                    alert(`${walletType.charAt(0).toUpperCase() + walletType.slice(1)} wallet integration coming soon! Please use Phantom for now.`);
+                }
+            } catch (error) {
+                console.error('Wallet connection error:', error);
+                alert(`Failed to connect wallet: ${error.message}`);
+            }
+        }
+
+        async function connectPhantom() {
+            // Check if Phantom is installed
+            if (!window.solana || !window.solana.isPhantom) {
+                alert('Phantom wallet not detected! Please install Phantom from https://phantom.app/');
+                window.open('https://phantom.app/', '_blank');
+                return;
+            }
+
+            try {
+                // Request connection to Phantom
+                const response = await window.solana.connect();
+                
+                // Connection successful
+                walletConnected = true;
+                connectedWallet = 'Phantom';
+                walletAddress = response.publicKey.toString();
+
+                // Update UI
+                updateWalletButton();
+                closeWalletModal();
+
+                // Show success message
+                alert(`Successfully connected to Phantom!\nAddress: ${walletAddress.slice(0, 4)}...${walletAddress.slice(-4)}`);
+
+                console.log('Connected to Phantom:', walletAddress);
+
+            } catch (error) {
+                if (error.code === 4001) {
+                    // User rejected the connection
+                    alert('Connection cancelled by user');
+                } else {
+                    console.error('Phantom connection error:', error);
+                    alert('Failed to connect to Phantom wallet');
+                }
+            }
+        }
+
+        async function disconnectWallet() {
+            try {
+                if (window.solana && window.solana.isPhantom && walletConnected) {
+                    await window.solana.disconnect();
                 }
                 
-                e.preventDefault();
+                walletConnected = false;
+                connectedWallet = null;
+                walletAddress = null;
+                updateWalletButton();
+                alert('Wallet disconnected successfully!');
+                
+                console.log('Wallet disconnected');
+            } catch (error) {
+                console.error('Disconnect error:', error);
+                // Reset state even if disconnect fails
+                walletConnected = false;
+                connectedWallet = null;
+                walletAddress = null;
+                updateWalletButton();
             }
         }
 
-        function handleMouseMove(e) {
-            if (!isInteracting || !currentHair) return;
+        function updateWalletButton() {
+            const btn = document.getElementById('connectWalletBtn');
             
-            const deltaX = e.clientX - lastMousePos.x;
-            const deltaY = e.clientY - lastMousePos.y;
-            
-            if (interactionMode === 'drag') {
-                // Convert screen pixels to canvas coordinates
-                const rect = canvas.getBoundingClientRect();
-                const scaleX = canvas.width / rect.width;
-                const scaleY = canvas.height / rect.height;
-                
-                hairSettings.position.x += deltaX * scaleX;
-                hairSettings.position.y += deltaY * scaleY;
-                
-                renderScene();
-            } else if (interactionMode === 'rotate') {
-                // Calculate rotation based on mouse movement
-                const rotationSensitivity = 0.5;
-                hairSettings.tilt += deltaX * rotationSensitivity;
-                
-                renderScene();
-            }
-            
-            lastMousePos = { x: e.clientX, y: e.clientY };
-            e.preventDefault();
-        }
-
-        function handleMouseUp(e) {
-            if (isInteracting) {
-                isInteracting = false;
-                interactionMode = 'none';
-                canvas.classList.remove('dragging', 'rotating');
+            if (walletConnected) {
+                btn.innerHTML = `✅ ${walletAddress.slice(0, 4)}...${walletAddress.slice(-4)}`;
+                btn.classList.add('connected');
+                btn.title = `Connected to ${connectedWallet}\nAddress: ${walletAddress}\nClick to disconnect`;
+            } else {
+                btn.innerHTML = '🔗 Connect Wallet';
+                btn.classList.remove('connected');
+                btn.title = 'Connect your Solana wallet';
             }
         }
 
-        function handleWheel(e) {
-            if (!currentHair) return;
-            
-            e.preventDefault();
-            
-            // Zoom hair with mouse wheel
-            const zoomSensitivity = 0.001;
-            const zoomDelta = -e.deltaY * zoomSensitivity;
-            
-            hairSettings.volume = Math.max(0.3, Math.min(2.0, hairSettings.volume + zoomDelta));
-            
-            // Update slider to reflect change
-            const volumeSlider = document.getElementById('hairVolume');
-            if (volumeSlider) {
-                volumeSlider.value = hairSettings.volume * 100;
-                updateHairVolume();
-            }
-            
-            renderScene();
-        }
+        // Listen for account changes
+        if (window.solana) {
+            window.solana.on('connect', () => {
+                console.log('Phantom wallet connected');
+            });
 
-        function handleTouchStart(e) {
-            if (!currentHair) return;
-            
-            e.preventDefault();
-            touches = Array.from(e.touches);
-            
-            if (touches.length === 1) {
-                // Single touch - start dragging
-                const rect = canvas.getBoundingClientRect();
-                const x = touches[0].clientX - rect.left;
-                const y = touches[0].clientY - rect.top;
-                const canvasX = (x / rect.width) * canvas.width;
-                const canvasY = (y / rect.height) * canvas.height;
-                
-                if (isPointInHair(canvasX, canvasY)) {
-                    isInteracting = true;
-                    interactionMode = 'drag';
-                    lastMousePos = { x: touches[0].clientX, y: touches[0].clientY };
+            window.solana.on('disconnect', () => {
+                console.log('Phantom wallet disconnected');
+                walletConnected = false;
+                connectedWallet = null;
+                walletAddress = null;
+                updateWalletButton();
+            });
+
+            window.solana.on('accountChanged', (publicKey) => {
+                if (publicKey) {
+                    walletAddress = publicKey.toString();
+                    updateWalletButton();
+                    console.log('Account changed to:', walletAddress);
+                } else {
+                    // Account disconnected
+                    walletConnected = false;
+                    connectedWallet = null;
+                    walletAddress = null;
+                    updateWalletButton();
                 }
-            } else if (touches.length === 2) {
-                // Two touches - prepare for pinch/rotate
-                isInteracting = true;
-                interactionMode = 'gesture';
-            }
+            });
         }
 
-        function handleTouchMove(e) {
-            if (!isInteracting || !currentHair) return;
-            
-            e.preventDefault();
-            const newTouches = Array.from(e.touches);
-            
-            if (interactionMode === 'drag' && newTouches.length === 1) {
-                const deltaX = newTouches[0].clientX - lastMousePos.x;
-                const deltaY = newTouches[0].clientY - lastMousePos.y;
-                
-                const rect = canvas.getBoundingClientRect();
-                const scaleX = canvas.width / rect.width;
-                const scaleY = canvas.height / rect.height;
-                
-                hairSettings.position.x += deltaX * scaleX;
-                hairSettings.position.y += deltaY * scaleY;
-                
-                lastMousePos = { x: newTouches[0].clientX, y: newTouches[0].clientY };
-                renderScene();
-            } else if (interactionMode === 'gesture' && newTouches.length === 2 && touches.length === 2) {
-                // Calculate pinch for scaling
-                const oldDistance = getDistance(touches[0], touches[1]);
-                const newDistance = getDistance(newTouches[0], newTouches[1]);
-                const scaleFactor = newDistance / oldDistance;
-                
-                hairSettings.volume = Math.max(0.3, Math.min(2.0, hairSettings.volume * scaleFactor));
-                
-                // Calculate rotation
-                const oldAngle = getAngle(touches[0], touches[1]);
-                const newAngle = getAngle(newTouches[0], newTouches[1]);
-                const angleDelta = newAngle - oldAngle;
-                
-                hairSettings.tilt += angleDelta * 180 / Math.PI * 0.5;
-                
-                // Update sliders
-                const volumeSlider = document.getElementById('hairVolume');
-                if (volumeSlider) {
-                    volumeSlider.value = hairSettings.volume * 100;
-                    updateHairVolume();
+        // Close popup when clicking outside
+        document.getElementById('rulesPopup').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closePopup();
+            }
+        });
+
+        // Close wallet modal when clicking outside
+        document.getElementById('walletModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeWalletModal();
+            }
+        });
+
+        // Close popup with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                if (document.getElementById('walletModal').classList.contains('active')) {
+                    closeWalletModal();
+                } else {
+                    closePopup();
                 }
-                
-                renderScene();
             }
+        });
+
+        // Navigation functions
+        function showHomePage() {
+            document.getElementById('homePage').style.display = 'block';
+            document.getElementById('createCoinPage').classList.remove('active');
+            document.getElementById('profilePage').classList.remove('active');
+            document.getElementById('mainContent').classList.remove('create-mode');
             
-            touches = newTouches;
+            // Update nav active state
+            document.querySelector('.nav-item a.active').classList.remove('active');
+            document.querySelector('.nav-item a[onclick="showHomePage()"]').classList.add('active');
         }
 
-        function handleTouchEnd(e) {
-            if (e.touches.length === 0) {
-                isInteracting = false;
-                interactionMode = 'none';
-                touches = [];
+        function showCreateCoinPage() {
+            document.getElementById('homePage').style.display = 'none';
+            document.getElementById('createCoinPage').classList.add('active');
+            document.getElementById('profilePage').classList.remove('active');
+            document.getElementById('mainContent').classList.add('create-mode');
+        }
+
+        function showProfilePage() {
+            document.getElementById('homePage').style.display = 'none';
+            document.getElementById('createCoinPage').classList.remove('active');
+            document.getElementById('profilePage').classList.add('active');
+            document.getElementById('mainContent').classList.add('create-mode');
+            
+            // Update nav active state
+            document.querySelector('.nav-item a.active').classList.remove('active');
+            document.querySelector('.nav-item a[onclick="showProfilePage()"]').classList.add('active');
+        }
+
+        // Go back to home page
+        function goBack() {
+            showHomePage();
+            resetForm();
+        }
+
+        // Reset form function
+        function resetForm() {
+            document.getElementById('coinName').value = '';
+            document.getElementById('coinTicker').value = '';
+            document.getElementById('coinDescription').value = '';
+            removeFile();
+            updatePreview();
+        }
+
+        // Profile image upload handling
+        function handleProfileImageUpload(file) {
+            if (!file) return;
+
+            // Validate file size (10MB max for profile images)
+            const maxSize = 10 * 1024 * 1024;
+            if (file.size > maxSize) {
+                alert('Profile image too large! Maximum size is 10MB');
+                return;
             }
-        }
 
-        function getDistance(touch1, touch2) {
-            const dx = touch1.clientX - touch2.clientX;
-            const dy = touch1.clientY - touch2.clientY;
-            return Math.sqrt(dx * dx + dy * dy);
-        }
-
-        function getAngle(touch1, touch2) {
-            return Math.atan2(touch2.clientY - touch1.clientY, touch2.clientX - touch1.clientX);
-        }
-
-        function isPointInHair(x, y) {
-            if (!currentHair) return false;
-            
-            const centerX = canvas.width / 2 + hairSettings.position.x;
-            const centerY = canvas.height * 0.15 + hairSettings.position.y;
-            const hairWidth = canvas.width * 0.85 * hairSettings.volume;
-            const hairHeight = canvas.height * 0.65 * hairSettings.volume;
-            
-            // Simple ellipse collision detection
-            const dx = (x - centerX) / (hairWidth / 2);
-            const dy = (y - centerY) / (hairHeight / 2);
-            
-            return (dx * dx + dy * dy) <= 1;
-        }
-
-        function showInteractionElements() {
-            if (!currentHair) return;
-            
-            const overlay = document.getElementById('hairControlsOverlay');
-            const resizeHandle = document.getElementById('resizeHandle');
-            const hairOutline = document.getElementById('hairOutline');
-            
-            if (overlay && resizeHandle && hairOutline) {
-                resizeHandle.style.opacity = '0.8';
-                hairOutline.style.opacity = '0.3';
-                
-                // Position elements based on hair bounds
-                updateHairBounds();
-                resizeHandle.style.left = (hairBounds.x + hairBounds.width - 6) + 'px';
-                resizeHandle.style.top = (hairBounds.y - 6) + 'px';
-                
-                hairOutline.style.left = hairBounds.x + 'px';
-                hairOutline.style.top = hairBounds.y + 'px';
-                hairOutline.style.width = hairBounds.width + 'px';
-                hairOutline.style.height = hairBounds.height + 'px';
-            }
-        }
-
-        function hideInteractionElements() {
-            if (isInteracting) return;
-            
-            const resizeHandle = document.getElementById('resizeHandle');
-            const hairOutline = document.getElementById('hairOutline');
-            
-            if (resizeHandle && hairOutline) {
-                resizeHandle.style.opacity = '0';
-                hairOutline.style.opacity = '0';
-            }
-        }
-
-        function updateHairBounds() {
-            if (!currentHair) return;
-            
-            const rect = canvas.getBoundingClientRect();
-            const centerX = canvas.width / 2 + hairSettings.position.x;
-            const centerY = canvas.height * 0.15 + hairSettings.position.y;
-            const hairWidth = canvas.width * 0.85 * hairSettings.volume;
-            const hairHeight = canvas.height * 0.65 * hairSettings.volume;
-            
-            // Convert canvas coordinates to screen coordinates
-            const scaleX = rect.width / canvas.width;
-            const scaleY = rect.height / canvas.height;
-            
-            hairBounds = {
-                x: (centerX - hairWidth / 2) * scaleX,
-                y: (centerY - hairHeight / 2) * scaleY,
-                width: hairWidth * scaleX,
-                height: hairHeight * scaleY
-            };
-        }
-
-        function handleImageUpload(file) {
+            // Only allow images for profile pictures
             if (!file.type.startsWith('image/')) {
-                alert('Please upload a valid image file!');
+                alert('Please select an image file for your profile picture');
                 return;
             }
-
-            if (file.size > 15 * 1024 * 1024) {
-                alert('File size must be under 15MB for optimal processing!');
-                return;
-            }
-
-            showLoading(true);
 
             const reader = new FileReader();
             reader.onload = function(e) {
-                const img = new Image();
-                img.onload = function() {
-                    originalImage = img;
-                    setupCanvas();
-                    document.getElementById('uploadZone').style.display = 'none';
-                    document.getElementById('workspaceArea').style.display = 'block';
-                    showLoading(false);
-                };
-                img.onerror = () => {
-                    alert('Error loading image. Please try a different file.');
-                    showLoading(false);
-                };
-                img.src = e.target.result;
+                profileImageURL = e.target.result;
+                
+                // Update profile avatar preview
+                const avatarPreview = document.getElementById('profileAvatarPreview');
+                avatarPreview.innerHTML = `<img src="${profileImageURL}" alt="Profile avatar">`;
+                
+                // Update preview in preview section
+                const previewAvatar = document.querySelector('#previewProfileAvatarText').parentElement;
+                previewAvatar.innerHTML = `<img src="${profileImageURL}" alt="Profile avatar">`;
             };
             reader.readAsDataURL(file);
         }
 
-        function setupCanvas() {
-            const maxWidth = 800;
-            const maxHeight = 600;
-            let { width, height } = originalImage;
-
-            // Maintain aspect ratio with high quality
-            if (width > maxWidth || height > maxHeight) {
-                const ratio = Math.min(maxWidth / width, maxHeight / height);
-                width *= ratio;
-                height *= ratio;
-            }
-
-            canvas.width = width;
-            canvas.height = height;
+        // Update profile preview
+        function updateProfilePreview() {
+            const displayName = document.getElementById('profileDisplayName').value || 'Display Name';
+            const username = document.getElementById('profileUsername').value || 'username';
+            const bio = document.getElementById('profileBio').value || 'Your bio will appear here...';
             
-            renderScene();
-        }
-
-        function renderScene() {
-            if (!originalImage) return;
+            document.getElementById('previewDisplayName').textContent = displayName;
+            document.getElementById('previewUsername').textContent = username.startsWith('@') ? username : '@' + username;
+            document.getElementById('previewBio').textContent = bio;
             
-            // Clear with high quality
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Draw original image with anti-aliasing
-            ctx.save();
-            ctx.imageSmoothingEnabled = true;
-            ctx.imageSmoothingQuality = 'high';
-            ctx.drawImage(originalImage, 0, 0, canvas.width, canvas.height);
-            ctx.restore();
-            
-            // Render realistic hair if selected
-            if (currentHair) {
-                renderUltraRealisticHair();
-                updateHairBounds();
+            // Update avatar if no image uploaded
+            if (!profileImageURL) {
+                const firstLetter = displayName.charAt(0).toUpperCase() || '?';
+                document.getElementById('profileAvatarText').textContent = firstLetter;
+                document.getElementById('previewProfileAvatarText').textContent = firstLetter;
             }
         }
 
-        function renderUltraRealisticHair() {
-            const pattern = hairPatterns[currentHair.type];
-            if (!pattern) return;
-
-            // Use requestAnimationFrame for smooth rendering
-            requestAnimationFrame(() => {
-                ctx.save();
-                
-                // Setup hair rendering context
-                const centerX = canvas.width / 2;
-                const faceTopY = canvas.height * 0.15; // Estimate face top
-                
-                ctx.translate(centerX + hairSettings.position.x, faceTopY + hairSettings.position.y);
-                ctx.rotate(hairSettings.tilt * Math.PI / 180);
-                
-                const hairWidth = canvas.width * 0.85 * hairSettings.volume;
-                const hairHeight = canvas.height * 0.65 * hairSettings.volume;
-                
-                // Render multiple layers for depth
-                renderHairLayers(pattern, hairWidth, hairHeight);
-                
-                ctx.restore();
-            });
-        }
-
-        function renderHairLayers(pattern, width, height) {
-            const layers = Math.floor(8 * hairSettings.density);
-            const strandsPerLayer = Math.floor(150 * hairSettings.density);
+        // Save profile function
+        function saveProfile() {
+            const displayName = document.getElementById('profileDisplayName').value;
+            const username = document.getElementById('profileUsername').value;
             
-            for (let layer = 0; layer < layers; layer++) {
-                const layerDepth = layer / layers;
-                const layerOpacity = (0.9 - layerDepth * 0.3) * hairSettings.opacity;
-                
-                ctx.globalAlpha = layerOpacity;
-                
-                // Render hair crown/volume
-                if (layer < 3) {
-                    renderHairCrown(pattern, width, height, layerDepth);
-                }
-                
-                // Render individual strands
-                renderHairStrands(pattern, width, height, strandsPerLayer, layerDepth);
-                
-                // Add highlights and shadows
-                if (layer === 0) renderHairHighlights(pattern, width, height);
-                if (layer === layers - 1) renderHairShadows(pattern, width, height);
-            }
-        }
-
-        function renderHairCrown(pattern, width, height, depth) {
-            // Create realistic scalp coverage
-            const crownWidth = width * 0.9;
-            const crownHeight = height * 0.4;
-            
-            // Base scalp coverage
-            const gradient = ctx.createRadialGradient(0, -height * 0.1, 0, 0, -height * 0.1, crownWidth * 0.6);
-            
-            pattern.baseColors.forEach((color, index) => {
-                const stop = index / (pattern.baseColors.length - 1);
-                gradient.addColorStop(stop, color);
-            });
-            
-            ctx.fillStyle = gradient;
-            ctx.beginPath();
-            ctx.ellipse(0, -height * 0.1, crownWidth * 0.5, crownHeight * 0.6, 0, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Add texture to crown
-            ctx.globalCompositeOperation = 'multiply';
-            for (let i = 0; i < 30; i++) {
-                const x = (Math.random() - 0.5) * crownWidth;
-                const y = -height * 0.1 + (Math.random() - 0.5) * crownHeight;
-                const radius = Math.random() * 3 + 1;
-                
-                ctx.fillStyle = pattern.shadows[Math.floor(Math.random() * pattern.shadows.length)];
-                ctx.beginPath();
-                ctx.arc(x, y, radius, 0, Math.PI * 2);
-                ctx.fill();
-            }
-            ctx.globalCompositeOperation = 'source-over';
-        }
-
-        function renderHairStrands(pattern, width, height, strandCount, depth) {
-            for (let i = 0; i < strandCount; i++) {
-                renderIndividualStrand(pattern, width, height, i, strandCount, depth);
-            }
-        }
-
-        function renderIndividualStrand(pattern, width, height, index, total, depth) {
-            // Calculate strand position and properties
-            const angle = (index / total) * Math.PI * 1.4 - Math.PI * 0.7;
-            const variance = (Math.random() - 0.5) * 0.3;
-            const actualAngle = angle + variance;
-            
-            const startX = Math.sin(actualAngle) * width * 0.4;
-            const startY = -height * 0.2;
-            
-            // Strand color with natural variation
-            const colorIndex = Math.floor(Math.random() * pattern.baseColors.length);
-            const baseColor = pattern.baseColors[colorIndex];
-            
-            // Create gradient along strand length
-            const strandLength = height * (0.8 + Math.random() * 0.4);
-            const gradient = ctx.createLinearGradient(startX, startY, startX, startY + strandLength);
-            
-            gradient.addColorStop(0, baseColor);
-            gradient.addColorStop(0.3, pattern.baseColors[(colorIndex + 1) % pattern.baseColors.length]);
-            gradient.addColorStop(0.7, baseColor);
-            gradient.addColorStop(1, pattern.shadows[Math.floor(Math.random() * pattern.shadows.length)]);
-            
-            ctx.strokeStyle = gradient;
-            ctx.lineWidth = (2 + Math.random() * 2) * hairSettings.volume;
-            ctx.lineCap = 'round';
-            
-            // Draw strand with natural curve
-            ctx.beginPath();
-            ctx.moveTo(startX, startY);
-            
-            const segments = 8;
-            for (let seg = 1; seg <= segments; seg++) {
-                const progress = seg / segments;
-                const x = startX + Math.sin(actualAngle + Math.sin(progress * Math.PI * 2) * 0.1) * progress * width * 0.3;
-                const y = startY + progress * strandLength;
-                
-                if (seg === 1) {
-                    ctx.lineTo(x, y);
-                } else {
-                    const prevProgress = (seg - 1) / segments;
-                    const prevX = startX + Math.sin(actualAngle + Math.sin(prevProgress * Math.PI * 2) * 0.1) * prevProgress * width * 0.3;
-                    const prevY = startY + prevProgress * strandLength;
-                    
-                    const cp1X = prevX + (x - prevX) * 0.5 + (Math.random() - 0.5) * 10;
-                    const cp1Y = prevY + (y - prevY) * 0.3;
-                    const cp2X = prevX + (x - prevX) * 0.7 + (Math.random() - 0.5) * 8;
-                    const cp2Y = prevY + (y - prevY) * 0.7;
-                    
-                    ctx.bezierCurveTo(cp1X, cp1Y, cp2X, cp2Y, x, y);
-                }
-            }
-            
-            ctx.stroke();
-        }
-
-        function renderHairHighlights(pattern, width, height) {
-            if (hairSettings.shine < 0.5) return;
-            
-            ctx.globalCompositeOperation = 'screen';
-            ctx.globalAlpha = hairSettings.shine * 0.6;
-            
-            for (let i = 0; i < 20; i++) {
-                const x = (Math.random() - 0.5) * width * 0.8;
-                const y = -height * 0.2 + Math.random() * height * 0.8;
-                
-                const highlightGradient = ctx.createRadialGradient(x, y, 0, x, y, 15);
-                highlightGradient.addColorStop(0, pattern.highlights[0] + '80');
-                highlightGradient.addColorStop(1, pattern.highlights[0] + '00');
-                
-                ctx.fillStyle = highlightGradient;
-                ctx.beginPath();
-                ctx.ellipse(x, y, 12, 4, Math.random() * Math.PI, 0, Math.PI * 2);
-                ctx.fill();
-            }
-            
-            ctx.globalCompositeOperation = 'source-over';
-        }
-
-        function renderHairShadows(pattern, width, height) {
-            ctx.globalCompositeOperation = 'multiply';
-            ctx.globalAlpha = 0.3;
-            
-            for (let i = 0; i < 15; i++) {
-                const x = (Math.random() - 0.5) * width * 0.6;
-                const y = -height * 0.1 + Math.random() * height * 0.5;
-                
-                ctx.fillStyle = pattern.shadows[0] + '40';
-                ctx.beginPath();
-                ctx.ellipse(x, y, 8, 20, Math.random() * Math.PI, 0, Math.PI * 2);
-                ctx.fill();
-            }
-            
-            ctx.globalCompositeOperation = 'source-over';
-        }
-
-        function selectWig(type, style) {
-            document.querySelectorAll('.wig-card').forEach(card => card.classList.remove('selected'));
-            event.target.closest('.wig-card').classList.add('selected');
-            
-            currentHair = { type, style };
-            renderScene();
-        }
-
-        function adjustWig(type, direction) {
-            if (!currentHair) return;
-            
-            const moveAmount = 6;
-            const rotateAmount = 3;
-            
-            switch (type) {
-                case 'move':
-                    if (direction === 'up') hairSettings.position.y -= moveAmount;
-                    else if (direction === 'down') hairSettings.position.y += moveAmount;
-                    else if (direction === 'left') hairSettings.position.x -= moveAmount;
-                    else if (direction === 'right') hairSettings.position.x += moveAmount;
-                    break;
-                    
-                case 'tilt':
-                    if (direction === 'left') hairSettings.tilt -= rotateAmount;
-                    else if (direction === 'right') hairSettings.tilt += rotateAmount;
-                    break;
-                    
-                case 'part':
-                    hairSettings.part = direction;
-                    break;
-                    
-                case 'volume':
-                    if (direction === 'more') hairSettings.volume = Math.min(1.5, hairSettings.volume + 0.1);
-                    else if (direction === 'less') hairSettings.volume = Math.max(0.6, hairSettings.volume - 0.1);
-                    break;
-                    
-                case 'texture':
-                    hairSettings.texture = direction;
-                    break;
-            }
-            
-            renderScene();
-        }
-
-        function updateHairVolume() {
-            const value = document.getElementById('hairVolume').value;
-            hairSettings.volume = value / 100;
-            document.getElementById('volumeValue').textContent = value + '%';
-            renderScene();
-        }
-
-        function updateHairOpacity() {
-            const value = document.getElementById('hairOpacity').value;
-            hairSettings.opacity = value / 100;
-            document.getElementById('opacityValue').textContent = value + '%';
-            renderScene();
-        }
-
-        function updateHairDensity() {
-            const value = document.getElementById('hairDensity').value;
-            hairSettings.density = value / 100;
-            document.getElementById('densityValue').textContent = value + '%';
-            renderScene();
-        }
-
-        function updateHairShine() {
-            const value = document.getElementById('hairShine').value;
-            hairSettings.shine = value / 100;
-            document.getElementById('shineValue').textContent = value + '%';
-            renderScene();
-        }
-
-        function resetHairStyle() {
-            hairSettings = {
-                position: { x: 0, y: -20 },
-                volume: 1.0,
-                opacity: 0.9,
-                density: 1.0,
-                shine: 0.8,
-                tilt: 0,
-                part: 'center',
-                texture: 'natural',
-                flow: 'down'
-            };
-            
-            // Reset sliders
-            document.getElementById('hairVolume').value = 100;
-            document.getElementById('hairOpacity').value = 90;
-            document.getElementById('hairDensity').value = 100;
-            document.getElementById('hairShine').value = 80;
-            
-            updateHairVolume();
-            updateHairOpacity();
-            updateHairDensity();
-            updateHairShine();
-        }
-
-        function removeHair() {
-            currentHair = null;
-            document.querySelectorAll('.wig-card').forEach(card => card.classList.remove('selected'));
-            renderScene();
-        }
-
-        function downloadResult() {
-            if (!originalImage) {
-                alert('Please upload an image first!');
+            if (!displayName || !username) {
+                alert('Please fill in at least your display name and username!');
                 return;
             }
             
-            const link = document.createElement('a');
-            link.download = `WIGS-result-${Date.now()}.png`;
-            link.href = canvas.toDataURL('image/png', 1.0);
-            link.click();
+            let message = `Profile saved successfully!\n\nDisplay Name: ${displayName}\nUsername: @${username.replace('@', '')}`;
+            
+            if (profileImageURL) {
+                message += '\nProfile picture updated';
+            }
+            
+            alert(message);
         }
 
-        function showLoading(show) {
-            document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
+        // File upload handling for coin creation
+        function handleFileUpload(file) {
+            if (!file) return;
+
+            // Validate file size
+            const maxSize = file.type.startsWith('image/') ? 10 * 1024 * 1024 : 50 * 1024 * 1024; // 10MB for images, 50MB for videos
+            if (file.size > maxSize) {
+                alert(`File too large! Maximum size is ${file.type.startsWith('image/') ? '10MB' : '50MB'}`);
+                return;
+            }
+
+            uploadedFile = file;
+            
+            // Show file preview info
+            document.getElementById('fileName').textContent = file.name;
+            document.getElementById('fileSize').textContent = formatFileSize(file.size);
+            
+            // If it's an image, create preview
+            if (file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    uploadedImageURL = e.target.result;
+                    
+                    // Update preview thumbnail
+                    const thumbnail = document.getElementById('fileThumbnail');
+                    thumbnail.src = uploadedImageURL;
+                    
+                    // Update coin preview avatar
+                    updatePreview();
+                };
+                reader.readAsDataURL(file);
+            } else {
+                // For videos, show video icon
+                const thumbnail = document.getElementById('fileThumbnail');
+                thumbnail.src = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNTAiIGhlaWdodD0iNTAiIHZpZXdCb3g9IjAgMCA1MCA1MCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHJlY3Qgd2lkdGg9IjUwIiBoZWlnaHQ9IjUwIiByeD0iOCIgZmlsbD0iIzMyY2QzMiIvPgo8cGF0aCBkPSJNMjAgMTVMMzUgMjVMMjAgMzVWMTVaIiBmaWxsPSJ3aGl0ZSIvPgo8L3N2Zz4K';
+            }
+            
+            // Show file preview and update upload area
+            document.getElementById('filePreview').classList.add('active');
+            document.getElementById('uploadArea').classList.add('has-file');
         }
+
+        // Remove file function
+        function removeFile() {
+            uploadedFile = null;
+            uploadedImageURL = null;
+            
+            // Hide file preview and reset upload area
+            document.getElementById('filePreview').classList.remove('active');
+            document.getElementById('uploadArea').classList.remove('has-file');
+            
+            // Reset file input
+            document.getElementById('fileInput').value = '';
+            
+            // Update preview
+            updatePreview();
+        }
+
+        // Format file size
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Update coin preview as user types
+        function updatePreview() {
+            const baseName = document.getElementById('coinName').value || 'Token Name';
+            const name = baseName.toLowerCase().endsWith('gor') ? baseName : baseName + 'gor';
+            const ticker = document.getElementById('coinTicker').value || 'TICKER';
+            const description = document.getElementById('coinDescription').value || 'Your gor token description will appear here...';
+            
+            document.getElementById('previewName').textContent = name;
+            document.getElementById('previewTicker').textContent = ticker.toUpperCase();
+            document.getElementById('previewDesc').textContent = description;
+            
+            // Update avatar
+            const avatarElement = document.getElementById('previewAvatar');
+            
+            if (uploadedImageURL) {
+                // Show uploaded image
+                avatarElement.innerHTML = `<img src="${uploadedImageURL}" alt="Coin avatar">`;
+            } else {
+                // Show first letter of coin name or frog emoji
+                const firstLetter = baseName ? baseName.charAt(0).toUpperCase() : '🐸';
+                avatarElement.innerHTML = baseName ? firstLetter : '🐸';
+            }
+        }
+
+        // Drag and drop functionality
+        function setupDragAndDrop() {
+            const uploadArea = document.getElementById('uploadArea');
+            
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, preventDefaults, false);
+            });
+
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, highlight, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                uploadArea.addEventListener(eventName, unhighlight, false);
+            });
+
+            function highlight(e) {
+                uploadArea.style.background = 'rgba(240, 250, 240, 0.9)';
+                uploadArea.style.borderColor = '#32cd32';
+            }
+
+            function unhighlight(e) {
+                if (!uploadedFile) {
+                    uploadArea.style.background = 'rgba(255, 255, 255, 0.5)';
+                    uploadArea.style.borderColor = 'rgba(34, 139, 34, 0.4)';
+                }
+            }
+
+            uploadArea.addEventListener('drop', handleDrop, false);
+
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                
+                if (files.length > 0) {
+                    handleFileUpload(files[0]);
+                }
+            }
+        }
+
+        // Create coin function
+        async function createCoin() {
+            const baseName = document.getElementById('coinName').value;
+            const ticker = document.getElementById('coinTicker').value;
+            
+            if (!baseName || !ticker) {
+                alert('Please fill in at least the token name and ticker!');
+                return;
+            }
+
+            if (!walletConnected) {
+                alert('Please connect your wallet first to create a gor token!');
+                openWalletModal();
+                return;
+            }
+
+            const fullName = baseName.toLowerCase().endsWith('gor') ? baseName : baseName + 'gor';
+            
+            let message = `Creating gor token: ${fullName} (${ticker.toUpperCase()})`;
+            if (uploadedFile) {
+                message += `\nWith uploaded file: ${uploadedFile.name}`;
+            }
+            message += `\nConnected wallet: ${connectedWallet}`;
+            message += `\nWallet address: ${walletAddress}`;
+            message += `\n\n🚀 Your gor token is launching instantly!`;
+            message += `\nNo approval needed - welcome to the gor revolution! 🐸`;
+            
+            alert(message);
+            
+            // Here you would normally submit to your backend with wallet signature
+            // For demo purposes, we'll just go back to home
+            goBack();
+        }
+
+        // Add event listeners when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // Coin creation preview updates
+            document.getElementById('coinName').addEventListener('input', updatePreview);
+            document.getElementById('coinTicker').addEventListener('input', updatePreview);
+            document.getElementById('coinDescription').addEventListener('input', updatePreview);
+            
+            // Profile preview updates
+            document.getElementById('profileDisplayName').addEventListener('input', updateProfilePreview);
+            document.getElementById('profileUsername').addEventListener('input', updateProfilePreview);
+            document.getElementById('profileBio').addEventListener('input', updateProfilePreview);
+            
+            // File uploads
+            document.getElementById('fileInput').addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    handleFileUpload(e.target.files[0]);
+                }
+            });
+
+            document.getElementById('profileImageInput').addEventListener('change', function(e) {
+                if (e.target.files.length > 0) {
+                    handleProfileImageUpload(e.target.files[0]);
+                }
+            });
+
+            // Wallet connection event listeners
+            document.getElementById('connectWalletBtn').addEventListener('click', openWalletModal);
+            document.getElementById('closeWalletBtn').addEventListener('click', closeWalletModal);
+            
+            // Wallet option clicks
+            document.querySelectorAll('.wallet-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    const walletType = this.getAttribute('data-wallet');
+                    connectWallet(walletType);
+                });
+            });
+            
+            // Setup drag and drop
+            setupDragAndDrop();
+        });
+
+        // Add navigation functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add click handlers to navigation items
+            document.querySelector('.nav-item a[href="#"]').onclick = function(e) {
+                e.preventDefault();
+                showHomePage();
+            };
+            
+            // Find and add click handler to profile link
+            const navItems = document.querySelectorAll('.nav-item a');
+            navItems.forEach(item => {
+                if (item.textContent.includes('profile')) {
+                    item.onclick = function(e) {
+                        e.preventDefault();
+                        showProfilePage();
+                    };
+                }
+            });
+        });
+
+        // Search functionality placeholder
+        document.querySelector('.search-btn').addEventListener('click', function() {
+            const searchTerm = document.querySelector('.search-input').value;
+            if (searchTerm) {
+                alert(`Searching for gor tokens: ${searchTerm}`);
+            }
+        });
+
+        // Create coin button functionality - only for launch-first-btn now
+        document.querySelectorAll('.launch-first-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault();
+                showCreateCoinPage();
+            });
+        });
     </script>
 </body>
 </html>
